@@ -72,4 +72,136 @@
                     <input type="text" id="clientName" name="name" required>
                 </div>
                 <div>
-                    <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
+                    <input type="text" id="clientRG" name="rg" required>
+                </div>
+                <div>
+                    <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                    <input type="text" id="clientCPF" name="cpf" required>
+                </div>
+                <div>
+                    <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+                    <input type="text" id="clientStreet" name="street" required>
+                </div>
+                <div>
+                    <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                    <input type="text" id="clientNeighborhood" name="neighborhood" required>
+                </div>
+                <div>
+                    <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                    <input type="text" id="clientCity" name="city" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Adicionar Cliente</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2 class="text-xl font-bold mb-4">Lançamento de Venda</h2>
+            <form id="saleForm" class="space-y-4">
+                <div>
+                    <label for="saleDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Venda</label>
+                    <input type="date" id="saleDate" name="date" required>
+                </div>
+                <div>
+                    <label for="saleInvoice" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo</label>
+                    <input type="text" id="saleInvoice" name="invoice" required>
+                </div>
+                <div>
+                    <label for="saleClientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="saleClientName" name="clientName" required>
+                </div>
+                <div>
+                    <label for="saleItems" class="block text-sm font-medium text-gray-700 mb-1">Itens da Venda (JSON)</label>
+                    <textarea id="saleItems" name="items" rows="4" required placeholder='Ex: [{"item":"Arroz", "quantidade":5}]'></textarea>
+                </div>
+                <div>
+                    <label for="saleTotal" class="block text-sm font-medium text-gray-700 mb-1">Valor Total (R$)</label>
+                    <input type="number" id="saleTotal" name="totalValue" step="0.01" min="0" required>
+                </div>
+                <div>
+                    <label for="promissoryDueDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                    <input type="date" id="promissoryDueDate" name="dueDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Finalizar Venda</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUHvf_KSgH3nCykEeiM1bKbC2JyJMzNHXSfbww0AlZ9WJHYpB0LuDNKEmOMLc557FOpA/exec';
+
+        const clientForm = document.getElementById('clientForm');
+        const saleForm = document.getElementById('saleForm');
+
+        clientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                type: 'cliente',
+                name: formData.get('name'),
+                rg: formData.get('rg'),
+                cpf: formData.get('cpf'),
+                street: formData.get('street'),
+                neighborhood: formData.get('neighborhood'),
+                city: formData.get('city')
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Cliente cadastrado com sucesso!');
+                    e.target.reset();
+                } else {
+                    alert('Erro ao cadastrar cliente: ' + result.message);
+                }
+            } catch (error) {
+                alert('Erro de conexão. Verifique sua internet.');
+                console.error('Erro:', error);
+            }
+        });
+
+        saleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                type: 'venda',
+                invoice: formData.get('invoice'),
+                date: formData.get('date'),
+                clientName: formData.get('clientName'),
+                items: JSON.parse(formData.get('items')),
+                totalValue: parseFloat(formData.get('totalValue')),
+                dueDate: formData.get('dueDate')
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Venda registrada com sucesso!');
+                    e.target.reset();
+                } else {
+                    alert('Erro ao registrar venda: ' + result.message);
+                }
+            } catch (error) {
+                alert('Erro de conexão. Verifique sua internet.');
+                console.error('Erro:', error);
+            }
+        });
+
+        // Configuração para a data de hoje no campo de data da venda
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('saleDate').value = today;
+        });
+    </script>
+</body>
+</html>
