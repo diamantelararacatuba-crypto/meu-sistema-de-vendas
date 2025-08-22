@@ -107,7 +107,7 @@
             </p>
         </header>
 
-        <!-- NOVO: Barra de navegação por abas com um container de cartão -->
+        <!-- Barra de navegação por abas com um container de cartão -->
         <div class="card mb-8">
             <nav class="flex space-x-2">
                 <button id="tab-client" class="tab-btn active">Cadastro de Clientes</button>
@@ -162,35 +162,35 @@
             </form>
         </section>
 
-        <!-- Seção de Lançamento de Venda -->
+        <!-- Seção de Lançamento de Venda (agora para Nota Promissória) -->
         <section id="section-sale" class="card hidden">
-            <h2 class="text-xl font-bold mb-4">Lançamento de Venda</h2>
+            <h2 class="text-xl font-bold mb-4">Lançamento de Nota Promissória</h2>
             <form id="saleForm" class="space-y-4">
                 <div>
-                    <label for="saleDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Venda</label>
-                    <input type="date" id="saleDate" name="date" required>
-                </div>
-                <div>
-                    <label for="saleInvoice" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo</label>
-                    <input type="text" id="saleInvoice" name="invoice" required>
+                    <label for="saleClientId" class="block text-sm font-medium text-gray-700 mb-1">ID do Cliente</label>
+                    <input type="text" id="saleClientId" name="clientId" required>
                 </div>
                 <div>
                     <label for="saleClientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                    <input type="text" id="saleClientName" name="clientName" required>
+                    <input type="text" id="saleClientName" name="clientName" readonly>
                 </div>
                 <div>
-                    <label for="saleItems" class="block text-sm font-medium text-gray-700 mb-1">Itens da Venda (JSON)</label>
-                    <textarea id="saleItems" name="items" rows="4" required placeholder='Ex: [{"item":"Arroz", "quantidade":5}]'></textarea>
+                    <label for="saleDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Emissão</label>
+                    <input type="date" id="saleDate" name="date" required>
+                </div>
+                <div>
+                    <label for="promissoryDueDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                    <input type="date" id="promissoryDueDate" name="dueDate" required>
                 </div>
                 <div>
                     <label for="saleTotal" class="block text-sm font-medium text-gray-700 mb-1">Valor Total (R$)</label>
                     <input type="number" id="saleTotal" name="totalValue" step="0.01" min="0" required>
                 </div>
                 <div>
-                    <label for="promissoryDueDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
-                    <input type="date" id="promissoryDueDate" name="dueDate" required>
+                    <label for="salePaidAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago (R$)</label>
+                    <input type="number" id="salePaidAmount" name="paidAmount" step="0.01" min="0" value="0" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-full">Finalizar Venda</button>
+                <button type="submit" class="btn btn-primary w-full">Finalizar Nota Promissória</button>
             </form>
         </section>
 
@@ -199,16 +199,16 @@
             <h2 class="text-xl font-bold mb-4">Registro de Pagamento</h2>
             <form id="paymentForm" class="space-y-4">
                 <div>
-                    <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo</label>
-                    <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required>
+                    <label for="paymentClientId" class="block text-sm font-medium text-gray-700 mb-1">ID do Cliente</label>
+                    <input type="text" id="paymentClientId" name="clientId" required>
+                </div>
+                <div>
+                    <label for="paymentClientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="paymentClientName" name="clientName" readonly>
                 </div>
                 <div>
                     <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago (R$)</label>
                     <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required>
-                </div>
-                <div>
-                    <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento</label>
-                    <input type="date" id="paymentNewDueDate" name="newDueDate" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-full">Registrar Pagamento</button>
             </form>
@@ -221,9 +221,9 @@
     </div>
 
     <script>
-        // Oculta todas as seções, exceto a de clientes.
         document.addEventListener('DOMContentLoaded', () => {
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUHvf_KSgH3nCykEeiM1bKbC2JyJMzNHXSfbww0AlZ9WJHYpB0LuDNKEmOMLc557FOpA/exec';
+            // SUBSTITUA ESTA URL PELA URL DO SEU DEPLOY DO GOOGLE APPS SCRIPT
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-COaCEKwCbL521gv3PIQXbj3-HWSYLMRyIoGewaiPuErxXhSRfsAn58yjOaE3_Pr_/exec';
 
             // Referências para os botões e seções
             const tabClientBtn = document.getElementById('tab-client');
@@ -246,11 +246,27 @@
             const clientRGInput = document.getElementById('clientRG');
             const clientCPFInput = document.getElementById('clientCPF');
             const clientPhoneInput = document.getElementById('clientPhone');
+            const saleDateInput = document.getElementById('saleDate');
+            const promissoryDueDateInput = document.getElementById('promissoryDueDate');
+
+            // Novas referências para a seção de Vendas/Nota Promissória
+            const saleClientIdInput = document.getElementById('saleClientId');
+            const saleClientNameInput = document.getElementById('saleClientName');
+
+            // Novas referências para a seção de Pagamento
+            const paymentClientIdInput = document.getElementById('paymentClientId');
+            const paymentClientNameInput = document.getElementById('paymentClientName');
+
 
             // Aplica as máscaras de formatação com a biblioteca IMask
             if (clientRGInput) IMask(clientRGInput, { mask: '00.000.000-0' });
             if (clientCPFInput) IMask(clientCPFInput, { mask: '000.000.000-00' });
             if (clientPhoneInput) IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
+
+            // Define a data de hoje como valor padrão
+            const today = new Date().toISOString().split('T')[0];
+            if (saleDateInput) saleDateInput.value = today;
+            if (promissoryDueDateInput) promissoryDueDateInput.value = today;
 
             // Função para exibir a seção desejada e esconder as outras
             function showSection(sectionId) {
@@ -296,35 +312,59 @@
             if (clientForm) clientForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                const data = {
-                    type: 'cliente',
-                    name: formData.get('name'),
+                const clientData = {
+                    nome: formData.get('name'),
+                    telefone: formData.get('phone'),
                     rg: formData.get('rg'),
                     cpf: formData.get('cpf'),
-                    phone: formData.get('phone'),
-                    street: formData.get('street'),
-                    number: formData.get('number'),
-                    complement: formData.get('complement'),
-                    neighborhood: formData.get('neighborhood'),
-                    city: formData.get('city')
+                    rua: formData.get('street'),
+                    numero: formData.get('number'),
+                    complemento: formData.get('complement'),
+                    bairro: formData.get('neighborhood'),
+                    cidade: formData.get('city')
                 };
 
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify({ action: 'addClient', client: clientData }),
                         headers: { 'Content-Type': 'application/json' }
                     });
                     const result = await response.json();
-                    if (result.status === 'success') {
-                        showFeedbackModal('Cliente cadastrado com sucesso!');
+                    if (result.success) {
+                        showFeedbackModal('Cliente cadastrado com sucesso! ID: ' + result.data.newId);
                         e.target.reset();
                     } else {
-                        showFeedbackModal('Erro ao cadastrar cliente: ' + result.message);
+                        showFeedbackModal('Erro ao cadastrar cliente: ' + result.error);
                     }
                 } catch (error) {
                     showFeedbackModal('Erro de conexão. Verifique sua internet.');
                     console.error('Erro:', error);
+                }
+            });
+
+            // Listener para a entrada de ID do cliente no formulário de venda
+            if (saleClientIdInput) saleClientIdInput.addEventListener('input', async (e) => {
+                const clientId = e.target.value.trim();
+                if (clientId.length > 0) {
+                    try {
+                        const response = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'getClientById', clientId: clientId }),
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await response.json();
+                        if (result.success && result.data && result.data.nome) {
+                            saleClientNameInput.value = result.data.nome;
+                        } else {
+                            saleClientNameInput.value = 'Cliente não encontrado.';
+                        }
+                    } catch (error) {
+                        saleClientNameInput.value = 'Erro ao buscar cliente.';
+                        console.error('Erro:', error);
+                    }
+                } else {
+                    saleClientNameInput.value = '';
                 }
             });
 
@@ -332,32 +372,63 @@
             if (saleForm) saleForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                const data = {
-                    type: 'venda',
-                    invoice: formData.get('invoice'),
-                    date: formData.get('date'),
-                    clientName: formData.get('clientName'),
-                    items: JSON.parse(formData.get('items')),
+                const saleData = {
+                    clientId: formData.get('clientId'),
+                    saleDate: formData.get('date'),
+                    dueDate: formData.get('dueDate'),
                     totalValue: parseFloat(formData.get('totalValue')),
-                    dueDate: formData.get('dueDate')
+                    paidAmount: parseFloat(formData.get('paidAmount'))
                 };
+
+                // Validação simples
+                if (!saleData.clientId || isNaN(saleData.totalValue) || isNaN(saleData.paidAmount)) {
+                    showFeedbackModal('Por favor, preencha todos os campos corretamente.');
+                    return;
+                }
 
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify({ action: 'addPromissoryNote', data: saleData }),
                         headers: { 'Content-Type': 'application/json' }
                     });
                     const result = await response.json();
-                    if (result.status === 'success') {
-                        showFeedbackModal('Venda registrada com sucesso!');
+                    if (result.success) {
+                        showFeedbackModal('Nota promissória registrada com sucesso!');
                         e.target.reset();
+                        saleClientNameInput.value = ''; // Limpa o nome do cliente ao resetar
                     } else {
-                        showFeedbackModal('Erro ao registrar venda: ' + result.message);
+                        showFeedbackModal('Erro ao registrar nota promissória: ' + result.error);
                     }
                 } catch (error) {
                     showFeedbackModal('Erro de conexão. Verifique sua internet.');
                     console.error('Erro:', error);
+                }
+            });
+
+            // Listener para a entrada de ID do cliente no formulário de pagamento
+            if (paymentClientIdInput) paymentClientIdInput.addEventListener('input', async (e) => {
+                const clientId = e.target.value.trim();
+                if (clientId.length > 0) {
+                    // Busca o cliente pelo ID
+                    try {
+                        const response = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'getClientById', clientId: clientId }),
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await response.json();
+                        if (result.success && result.data && result.data.nome) {
+                            paymentClientNameInput.value = result.data.nome;
+                        } else {
+                            paymentClientNameInput.value = 'Cliente não encontrado.';
+                        }
+                    } catch (error) {
+                        paymentClientNameInput.value = 'Erro ao buscar cliente.';
+                        console.error('Erro:', error);
+                    }
+                } else {
+                    paymentClientNameInput.value = '';
                 }
             });
 
@@ -365,48 +436,40 @@
             if (paymentForm) paymentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                const invoiceNumber = formData.get('invoiceNumber');
+                const clientId = formData.get('clientId');
                 const amount = parseFloat(formData.get('amount'));
-                const newDueDate = formData.get('newDueDate');
 
                 // Validação simples
-                if (invoiceNumber.trim() === '' || amount <= 0 || !newDueDate) {
+                if (clientId.trim() === '' || amount <= 0) {
                     showFeedbackModal('Por favor, preencha todos os campos corretamente.');
                     return;
                 }
 
                 const data = {
-                    type: 'pagamento',
-                    invoiceNumber: invoiceNumber,
-                    amount: amount,
-                    newDueDate: newDueDate
+                    clientId: clientId,
+                    amountPaid: amount,
                 };
 
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify({ action: 'addPaymentByClient', data: data }),
                         headers: { 'Content-Type': 'application/json' }
                     });
                     const result = await response.json();
-                    if (result.status === 'success') {
+                    if (result.success) {
                         showFeedbackModal('Pagamento registrado com sucesso!');
                         e.target.reset();
+                        // Limpa o nome do cliente ao resetar
+                        paymentClientNameInput.value = '';
                     } else {
-                        showFeedbackModal('Erro ao registrar pagamento: ' + result.message);
+                        showFeedbackModal('Erro ao registrar pagamento: ' + result.error);
                     }
                 } catch (error) {
                     showFeedbackModal('Erro de conexão. Verifique sua internet.');
                     console.error('Erro:', error);
                 }
             });
-
-            // Configuração para a data de hoje no campo de data da venda
-            const today = new Date().toISOString().split('T')[0];
-            const saleDateInput = document.getElementById('saleDate');
-            if (saleDateInput) {
-                saleDateInput.value = today;
-            }
         });
     </script>
 </body>

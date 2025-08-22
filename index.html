@@ -286,7 +286,6 @@
             allContentSections.forEach(section => {
                 section.classList.add('hidden');
             });
-
             const targetSection = document.getElementById(targetSectionId);
             if (targetSection) {
                 targetSection.classList.remove('hidden');
@@ -294,16 +293,14 @@
         }
 
         // --- Lógica das Novas Seções ---
-
+        
         // Seção: Cadastrar Cliente
         function setupRegisterClientSection() {
             const saveClientBtn = document.getElementById('save-client-btn');
             const statusMessage = document.getElementById('client-status-message');
-
             saveClientBtn.addEventListener('click', async () => {
                 statusMessage.textContent = 'Salvando cliente...';
                 statusMessage.className = 'mt-4 text-center text-gray-500';
-
                 const name = document.getElementById('client-name').value;
                 const phone = document.getElementById('client-phone').value;
                 const rg = document.getElementById('client-rg').value;
@@ -333,7 +330,7 @@
                         cidade: city
                     }
                 };
-
+                
                 try {
                     const result = await fetchApi('addClient', { client: newClient });
                     if (result.success) {
@@ -360,9 +357,11 @@
 
             async function renderClients(filterCity) {
                 clientsListDiv.innerHTML = '<div class="text-center text-gray-500 p-4">Carregando clientes...</div>';
+
                 try {
                     const clients = await fetchApi('getClients');
                     const cities = new Set(clients.map(c => c.endereco.cidade));
+                    
                     cityFilterSelect.innerHTML = `<option value="all">Todas as Cidades</option>`;
                     cities.forEach(city => {
                         if (city) {
@@ -383,40 +382,39 @@
                     }
 
                     if (filteredClients.length === 0) {
-                        noClientsMessage.classList.remove('hidden');
                         clientsListDiv.innerHTML = '';
+                        noClientsMessage.classList.remove('hidden');
                         return;
-                    } else {
-                        noClientsMessage.classList.add('hidden');
                     }
 
-                    let tableHtml = `<table class="min-w-full divide-y divide-gray-200 rounded-lg shadow overflow-hidden">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
-
-                    filteredClients.forEach(client => {
-                        tableHtml += `
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.id}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.nome}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.telefone}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.endereco.cidade || 'N/A'}</td>
-                            </tr>`;
-                    });
-
-                    tableHtml += `</tbody></table>`;
-                    clientsListDiv.innerHTML = tableHtml;
-
-                } catch (error) {
-                    clientsListDiv.innerHTML = `<div class="text-center text-red-500 p-4">Erro ao carregar clientes.</div>`;
                     noClientsMessage.classList.add('hidden');
+                    const tableHtml = `
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endereço</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${filteredClients.map(client => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.id}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.nome}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.telefone}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.endereco.rua}, ${client.endereco.numero} - ${client.endereco.bairro}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.endereco.cidade}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    clientsListDiv.innerHTML = tableHtml;
+                } catch (error) {
+                    clientsListDiv.innerHTML = '<div class="text-center text-red-500 p-4">Erro ao carregar os clientes.</div>';
                 }
             }
 
@@ -424,11 +422,8 @@
                 renderClients(e.target.value);
             });
 
-            document.getElementById('view-clients').addEventListener('transitionend', () => {
-                if (!document.getElementById('view-clients').classList.contains('hidden')) {
-                    renderClients('all');
-                }
-            });
+            // Adiciona o listener para o carregamento da seção
+            document.getElementById('view-clients').addEventListener('section-visible', () => renderClients('all'));
         }
 
         // Seção: Vendas e Promissórias
@@ -438,56 +433,65 @@
             const addSaleBtn = document.getElementById('add-sale-btn');
             const statusMessage = document.getElementById('sale-status-message');
 
-            saleClientIdInput.addEventListener('input', async () => {
-                const clientId = parseInt(saleClientIdInput.value);
-                if (isNaN(clientId)) {
+            let searchTimeout;
+
+            // Busca o nome do cliente ao digitar o ID
+            saleClientIdInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                const clientId = saleClientIdInput.value.trim();
+                saleClientNameInput.value = 'Buscando...';
+
+                if (clientId) {
+                    searchTimeout = setTimeout(async () => {
+                        try {
+                            const client = await fetchApi('getClientById', { clientId });
+                            if (client && client.nome) {
+                                saleClientNameInput.value = client.nome;
+                            } else {
+                                saleClientNameInput.value = 'Cliente não encontrado.';
+                            }
+                        } catch (error) {
+                            saleClientNameInput.value = 'Erro na busca.';
+                        }
+                    }, 500); // Debounce de 500ms
+                } else {
                     saleClientNameInput.value = '';
-                    return;
-                }
-                try {
-                    const client = await fetchApi('getClient', { id: clientId });
-                    if (client) {
-                        saleClientNameInput.value = client.nome;
-                    } else {
-                        saleClientNameInput.value = '';
-                    }
-                } catch (error) {
-                    saleClientNameInput.value = 'Erro ao buscar cliente.';
                 }
             });
 
+            // Lidar com o envio do formulário
             addSaleBtn.addEventListener('click', async () => {
-                statusMessage.textContent = 'Adicionando venda...';
-                statusMessage.className = 'mt-4 text-center text-gray-500';
-
-                const clientId = parseInt(saleClientIdInput.value);
+                const clientId = saleClientIdInput.value.trim();
                 const saleDate = document.getElementById('sale-date').value;
                 const dueDate = document.getElementById('due-date').value;
-                const totalValue = parseFloat(document.getElementById('total-value').value);
-                const initialPayment = parseFloat(document.getElementById('initial-payment').value) || 0;
-                
-                if (!clientId || !saleDate || !dueDate || isNaN(totalValue)) {
-                    statusMessage.textContent = 'Preencha todos os campos obrigatórios (ID do cliente, datas e valor total).';
+                const totalValue = document.getElementById('total-value').value;
+                const initialPayment = document.getElementById('initial-payment').value || 0;
+
+                if (!clientId || !saleDate || !dueDate || !totalValue) {
+                    statusMessage.textContent = 'Por favor, preencha todos os campos obrigatórios.';
                     statusMessage.className = 'mt-4 text-center text-red-500';
                     return;
                 }
                 
+                statusMessage.textContent = 'Adicionando venda...';
+                statusMessage.className = 'mt-4 text-center text-gray-500';
+
                 const newSale = {
-                    clientId: clientId,
-                    saleDate: saleDate,
-                    dueDate: dueDate,
-                    totalValue: totalValue,
-                    paidAmount: initialPayment,
-                    status: initialPayment >= totalValue ? 'Quitada' : 'Pendente'
+                    clientId,
+                    saleDate,
+                    dueDate,
+                    totalValue: parseFloat(totalValue),
+                    initialPayment: parseFloat(initialPayment)
                 };
 
                 try {
                     const result = await fetchApi('addSale', { sale: newSale });
                     if (result.success) {
-                        statusMessage.textContent = `Venda para o cliente ${clientId} adicionada com sucesso!`;
+                        statusMessage.textContent = 'Venda e promissória adicionadas com sucesso!';
                         statusMessage.className = 'mt-4 text-center text-green-500';
                         // Limpa os campos
                         document.getElementById('promissory-sales').querySelectorAll('input').forEach(input => input.value = '');
+                        saleClientNameInput.value = ''; // Limpa o nome também
                     } else {
                         statusMessage.textContent = 'Erro ao adicionar venda: ' + result.error;
                         statusMessage.className = 'mt-4 text-center text-red-500';
@@ -498,113 +502,93 @@
                 }
             });
         }
-        
+
         // Seção: Próximos Vencimentos
         function setupUpcomingDueDatesSection() {
             const upcomingListDiv = document.getElementById('upcoming-list');
             const noUpcomingMessage = document.getElementById('no-upcoming-message');
-
+            
             async function renderUpcoming() {
                 upcomingListDiv.innerHTML = '<div class="text-center text-gray-500 p-4">Carregando vencimentos...</div>';
+
                 try {
-                    const sales = await fetchApi('getSales');
-                    const clients = await fetchApi('getClients');
-                    const clientsMap = clients.reduce((map, client) => {
-                        map[client.id] = client.nome;
-                        return map;
-                    }, {});
-
-                    const today = new Date();
-                    const upcomingSales = sales.filter(sale => {
-                        const dueDate = new Date(sale.dueDate);
-                        const diffTime = Math.abs(dueDate - today);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        return sale.status === 'Pendente' && dueDate >= today && diffDays <= 30;
-                    }).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-                    if (upcomingSales.length === 0) {
-                        noUpcomingMessage.classList.remove('hidden');
+                    const upcoming = await fetchApi('getUpcomingDueDates');
+                    if (upcoming.length === 0) {
                         upcomingListDiv.innerHTML = '';
+                        noUpcomingMessage.classList.remove('hidden');
                         return;
-                    } else {
-                        noUpcomingMessage.classList.add('hidden');
                     }
 
-                    let listHtml = `<table class="min-w-full divide-y divide-gray-200 rounded-lg shadow overflow-hidden">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Venda</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Vencimento</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Pendente</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
-                    
-                    upcomingSales.forEach(sale => {
-                        const clientName = clientsMap[sale.clientId] || 'Cliente Removido';
-                        const remaining = sale.totalValue - sale.paidAmount;
-                        listHtml += `
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale.id}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${clientName}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.dueDate}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500">R$ ${remaining.toFixed(2)}</td>
-                            </tr>`;
-                    });
-                    listHtml += `</tbody></table>`;
-                    upcomingListDiv.innerHTML = listHtml;
-                } catch (error) {
-                    upcomingListDiv.innerHTML = `<div class="text-center text-red-500 p-4">Erro ao carregar vencimentos.</div>`;
                     noUpcomingMessage.classList.add('hidden');
+                    const tableHtml = `
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Venda</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Pendente</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${upcoming.map(item => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.saleId}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.clientName}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${item.pendingValue.toFixed(2)}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.dueDate}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    upcomingListDiv.innerHTML = tableHtml;
+                } catch (error) {
+                    upcomingListDiv.innerHTML = '<div class="text-center text-red-500 p-4">Erro ao carregar os vencimentos.</div>';
                 }
             }
-
-            document.getElementById('upcoming-due-dates').addEventListener('transitionend', () => {
-                if (!document.getElementById('upcoming-due-dates').classList.contains('hidden')) {
-                    renderUpcoming();
-                }
-            });
+            
+            // Adiciona o listener para o carregamento da seção
+            document.getElementById('upcoming-due-dates').addEventListener('section-visible', renderUpcoming);
         }
 
         // Seção: Controle de Estoque
         function setupStockControlSection() {
-            const productCodeInput = document.getElementById('product-code');
             const addProductBtn = document.getElementById('add-product-btn');
             const statusMessage = document.getElementById('stock-status-message');
 
             addProductBtn.addEventListener('click', async () => {
-                statusMessage.textContent = 'Adicionando produto...';
-                statusMessage.className = 'mt-4 text-center text-gray-500';
+                const productCode = document.getElementById('product-code').value.trim();
+                const productDescription = document.getElementById('product-description').value.trim();
+                const stockQuantity = document.getElementById('stock-quantity').value;
+                const productPrice = document.getElementById('product-price').value;
+                const productCategory = document.getElementById('product-category').value;
 
-                let code = productCodeInput.value.trim();
-                const description = document.getElementById('product-description').value;
-                const quantity = parseInt(document.getElementById('stock-quantity').value);
-                const price = parseFloat(document.getElementById('product-price').value);
-                const category = document.getElementById('product-category').value;
-
-                if (!description || isNaN(quantity) || isNaN(price)) {
-                    statusMessage.textContent = 'Preencha todos os campos corretamente.';
+                if (!productDescription || !stockQuantity || !productPrice) {
+                    statusMessage.textContent = 'Por favor, preencha todos os campos obrigatórios.';
                     statusMessage.className = 'mt-4 text-center text-red-500';
                     return;
                 }
+                
+                statusMessage.textContent = 'Adicionando produto...';
+                statusMessage.className = 'mt-4 text-center text-gray-500';
 
-                // A lógica de geração de código automático agora é responsabilidade do servidor
                 const newProduct = {
-                    codigo: code,
-                    descricao: description,
-                    quantidade: quantity,
-                    preco: price,
-                    categoria: category
+                    codigo: productCode,
+                    descricao: productDescription,
+                    quantidade: parseInt(stockQuantity),
+                    preco: parseFloat(productPrice),
+                    categoria: productCategory
                 };
 
                 try {
                     const result = await fetchApi('addProduct', { product: newProduct });
                     if (result.success) {
-                        statusMessage.textContent = `Produto "${description}" adicionado com sucesso! Código: ${result.newCode || code}`;
+                        statusMessage.textContent = `Produto "${productDescription}" adicionado com sucesso!`;
                         statusMessage.className = 'mt-4 text-center text-green-500';
                         // Limpa os campos
-                        document.getElementById('stock-control').querySelectorAll('input, select').forEach(element => element.value = '');
+                        document.getElementById('stock-control').querySelectorAll('input').forEach(input => input.value = '');
+                        document.getElementById('product-category').value = 'casa';
                     } else {
                         statusMessage.textContent = 'Erro ao adicionar produto: ' + result.error;
                         statusMessage.className = 'mt-4 text-center text-red-500';
@@ -622,74 +606,86 @@
             const paymentClientNameInput = document.getElementById('payment-client-name');
             const paymentSaleIdInput = document.getElementById('payment-sale-id');
             const paymentSaleDetailsInput = document.getElementById('payment-sale-details');
-            const amountPaidInput = document.getElementById('amount-paid');
-            const balanceInfoDiv = document.getElementById('payment-balance-info');
             const addPaymentBtn = document.getElementById('add-payment-btn');
             const statusMessage = document.getElementById('payment-status-message');
+            const balanceInfoDiv = document.getElementById('payment-balance-info');
+            let clientSearchTimeout, saleSearchTimeout;
 
-            async function updatePaymentInfo() {
-                const clientId = parseInt(paymentClientIdInput.value);
-                const saleId = parseInt(paymentSaleIdInput.value);
-                
-                if (isNaN(clientId) || isNaN(saleId)) {
-                    paymentClientNameInput.value = '';
-                    paymentSaleDetailsInput.value = '';
-                    balanceInfoDiv.textContent = '';
-                    return;
+            // Busca nome do cliente ao digitar ID
+            paymentClientIdInput.addEventListener('input', () => {
+                clearTimeout(clientSearchTimeout);
+                const clientId = paymentClientIdInput.value.trim();
+                paymentClientNameInput.value = '';
+                if (clientId) {
+                    clientSearchTimeout = setTimeout(async () => {
+                        try {
+                            const client = await fetchApi('getClientById', { clientId });
+                            if (client && client.nome) {
+                                paymentClientNameInput.value = client.nome;
+                            } else {
+                                paymentClientNameInput.value = 'Cliente não encontrado.';
+                            }
+                        } catch (error) {
+                            paymentClientNameInput.value = 'Erro na busca.';
+                        }
+                    }, 500);
                 }
+            });
 
-                try {
-                    const result = await fetchApi('getSaleDetails', { clientId: clientId, saleId: saleId });
-                    if (result.success) {
-                        paymentClientNameInput.value = result.clientName;
-                        const remaining = result.totalValue - result.paidAmount;
-                        paymentSaleDetailsInput.value = `Venda de R$${result.totalValue.toFixed(2)} - Restante: R$${remaining.toFixed(2)}`;
-                        balanceInfoDiv.textContent = `Falta pagar: R$${remaining.toFixed(2)}`;
-                        balanceInfoDiv.className = 'mt-4 text-gray-600 font-bold';
-                    } else {
-                        paymentClientNameInput.value = '';
-                        paymentSaleDetailsInput.value = '';
-                        balanceInfoDiv.textContent = result.error;
-                        balanceInfoDiv.className = 'mt-4 text-red-500';
-                    }
-                } catch (error) {
-                    paymentClientNameInput.value = 'Erro ao buscar dados.';
-                    paymentSaleDetailsInput.value = '';
-                    balanceInfoDiv.textContent = 'Erro de comunicação com o servidor.';
-                    balanceInfoDiv.className = 'mt-4 text-red-500';
+            // Busca detalhes da venda ao digitar ID da venda
+            paymentSaleIdInput.addEventListener('input', () => {
+                clearTimeout(saleSearchTimeout);
+                const saleId = paymentSaleIdInput.value.trim();
+                paymentSaleDetailsInput.value = '';
+                balanceInfoDiv.textContent = '';
+                if (saleId) {
+                    saleSearchTimeout = setTimeout(async () => {
+                        try {
+                            const sale = await fetchApi('getSaleById', { saleId });
+                            if (sale) {
+                                paymentSaleDetailsInput.value = `Venda: ${sale.totalValue} | Pago: ${sale.paidAmount} | Vencimento: ${sale.dueDate}`;
+                                balanceInfoDiv.textContent = `Saldo Devedor: R$ ${(sale.totalValue - sale.paidAmount).toFixed(2)}`;
+                            } else {
+                                paymentSaleDetailsInput.value = 'Venda não encontrada.';
+                            }
+                        } catch (error) {
+                            paymentSaleDetailsInput.value = 'Erro na busca.';
+                        }
+                    }, 500);
                 }
-            }
-
-            paymentClientIdInput.addEventListener('input', updatePaymentInfo);
-            paymentSaleIdInput.addEventListener('input', updatePaymentInfo);
+            });
 
             addPaymentBtn.addEventListener('click', async () => {
-                statusMessage.textContent = 'Registrando pagamento...';
-                statusMessage.className = 'mt-4 text-center text-gray-500';
-
-                const clientId = parseInt(paymentClientIdInput.value);
-                const saleId = parseInt(paymentSaleIdInput.value);
-                const amountPaid = parseFloat(amountPaidInput.value);
+                const clientId = paymentClientIdInput.value.trim();
+                const saleId = paymentSaleIdInput.value.trim();
                 const paymentDate = document.getElementById('payment-date').value;
-                
-                if (isNaN(clientId) || isNaN(saleId) || isNaN(amountPaid) || !paymentDate) {
-                    statusMessage.textContent = 'Preencha todos os campos obrigatórios.';
+                const amountPaid = document.getElementById('amount-paid').value;
+
+                if (!clientId || !saleId || !paymentDate || !amountPaid) {
+                    statusMessage.textContent = 'Por favor, preencha todos os campos obrigatórios.';
                     statusMessage.className = 'mt-4 text-center text-red-500';
                     return;
                 }
+                
+                statusMessage.textContent = 'Registrando pagamento...';
+                statusMessage.className = 'mt-4 text-center text-gray-500';
+
+                const paymentData = {
+                    clientId,
+                    saleId,
+                    paymentDate,
+                    amountPaid: parseFloat(amountPaid)
+                };
 
                 try {
-                    const result = await fetchApi('addPayment', { clientId, saleId, amountPaid, paymentDate });
+                    const result = await fetchApi('addPayment', { payment: paymentData });
                     if (result.success) {
-                        if (result.status === 'Quitada') {
-                            statusMessage.textContent = `Pagamento registrado com sucesso! Venda quitada!`;
-                            statusMessage.className = 'mt-4 text-center text-green-500';
-                        } else {
-                            statusMessage.textContent = `Pagamento de R$${amountPaid.toFixed(2)} registrado. Faltam R$${result.remaining.toFixed(2)}.`;
-                            statusMessage.className = 'mt-4 text-center text-blue-500';
-                        }
+                        statusMessage.textContent = 'Pagamento registrado com sucesso!';
+                        statusMessage.className = 'mt-4 text-center text-green-500';
                         // Limpa os campos
                         document.getElementById('register-payment').querySelectorAll('input').forEach(input => input.value = '');
+                        paymentClientNameInput.value = '';
+                        paymentSaleDetailsInput.value = '';
                         balanceInfoDiv.textContent = '';
                     } else {
                         statusMessage.textContent = 'Erro ao registrar pagamento: ' + result.error;
@@ -706,72 +702,66 @@
         function setupInvoiceEntrySection() {
             const invoiceNumberInput = document.getElementById('invoiceNumber');
             const invoiceDetailsDiv = document.getElementById('invoiceDetailsDiv');
+            let searchTimeout;
 
-            async function searchAndRegisterInvoice() {
-                const invoiceNumber = invoiceNumberInput.value.toLowerCase();
-                if (invoiceNumber.length < 3) {
+            invoiceNumberInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                const invoiceNumber = invoiceNumberInput.value.trim();
+                invoiceDetailsDiv.innerHTML = '<div class="text-center text-gray-500 p-4">Buscando nota fiscal...</div>';
+
+                if (invoiceNumber) {
+                    searchTimeout = setTimeout(async () => {
+                        try {
+                            const invoice = await fetchApi('getInvoiceByNumber', { invoiceNumber });
+                            if (invoice) {
+                                invoiceDetailsDiv.innerHTML = `
+                                    <div class="space-y-2">
+                                        <p><span class="font-bold">Cliente:</span> ${invoice.clientName}</p>
+                                        <p><span class="font-bold">Data de Emissão:</span> ${invoice.issueDate}</p>
+                                        <p><span class="font-bold">Valor Total:</span> R$ ${invoice.totalValue.toFixed(2)}</p>
+                                        <p><span class="font-bold">Status:</span> <span class="text-green-600 font-semibold">Paga</span></p>
+                                    </div>
+                                `;
+                            } else {
+                                invoiceDetailsDiv.innerHTML = `
+                                    <div class="text-center text-gray-500 p-4">
+                                        <span class="text-4xl">❌</span>
+                                        <p class="mt-2">Nota fiscal não encontrada.</p>
+                                    </div>
+                                `;
+                            }
+                        } catch (error) {
+                            invoiceDetailsDiv.innerHTML = `
+                                <div class="text-center text-red-500 p-4">
+                                    <span class="text-4xl">⚠️</span>
+                                    <p class="mt-2">Erro ao buscar a nota fiscal.</p>
+                                </div>
+                            `;
+                            console.error('Erro:', error);
+                        }
+                    }, 500);
+                } else {
                     invoiceDetailsDiv.innerHTML = `
                         <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
                             <span class="text-4xl">🧾</span>
                             <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
                         </div>
                     `;
-                    return;
                 }
-
-                invoiceDetailsDiv.innerHTML = '<div class="text-center text-gray-500 p-4">Buscando nota fiscal...</div>';
-
-                try {
-                    const result = await fetchApi('getInvoiceDetails', { invoiceNumber });
-                    
-                    if (result.success) {
-                        let newProductsMessage = '';
-                        if (result.newProductsRegistered.length > 0) {
-                            newProductsMessage = `<p class="text-sm text-green-600 mt-2">Novos produtos cadastrados automaticamente: ${result.newProductsRegistered.join(', ')}.</p>`;
-                        }
-
-                        invoiceDetailsDiv.innerHTML = `
-                            <div class="p-6">
-                                <h4 class="text-xl font-bold text-gray-800 mb-2">Detalhes da Nota Fiscal: ${invoiceNumber.toUpperCase()}</h4>
-                                <p><strong>Fornecedor:</strong> ${result.supplier}</p>
-                                <h5 class="text-lg font-semibold mt-4">Produtos:</h5>
-                                <ul class="list-disc list-inside mt-2">
-                                    ${result.products.map(item => `<li>${item.quantity}x ${item.description} (R$ ${item.price.toFixed(2)})</li>`).join('')}
-                                </ul>
-                                ${newProductsMessage}
-                            </div>
-                        `;
-                    } else {
-                        invoiceDetailsDiv.innerHTML = `
-                            <div class="text-center text-gray-500 p-4">
-                                <span class="text-4xl">❌</span>
-                                <p class="mt-2">${result.error}</p>
-                            </div>
-                        `;
-                    }
-                } catch (error) {
-                    invoiceDetailsDiv.innerHTML = `
-                        <div class="text-center text-red-500 p-4">
-                            <span class="text-4xl">⚠️</span>
-                            <p class="mt-2">Erro de comunicação com o servidor.</p>
-                        </div>
-                    `;
-                }
-            }
-            invoiceNumberInput.addEventListener('input', searchAndRegisterInvoice);
+            });
         }
 
-        // --- Event Listeners Globais ---
 
-        // Event listeners para os botões do menu
+        // Event listener para os botões de ação do menu principal
         actionButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                // Esconde o menu principal e mostra o container de conteúdo
+                const target = e.currentTarget.dataset.target;
                 mainMenu.classList.add('hidden');
                 contentSectionsContainer.classList.remove('hidden');
-
-                const target = e.currentTarget.dataset.target;
                 showSection(target);
+                // Dispara um evento personalizado para que a seção possa carregar seus dados
+                const event = new Event('section-visible');
+                document.getElementById(target).dispatchEvent(event);
             });
         });
 
