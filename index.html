@@ -7,9 +7,596 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/imask"></script>
     <style>
-        /* Estilos CSS do código original */
-…        // Adicionar outros event listeners aqui para os outros formulários (products, sale, etc.)
-        // ... (código existente)
+        /* Estilos CSS gerais */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 2rem;
+        }
+        h1, h2 {
+            font-weight: 700;
+            color: #111827;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        input, select, textarea {
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        
+        /* Estilos para o modal de feedback */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="container">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800">Sistema de Gestão Financeira</h1>
+            <p class="mt-4 text-xl text-gray-600">
+                Gerencie vendas, clientes, estoque e finanças de forma simples e eficaz.
+            </p>
+        </header>
+
+        <!-- Seção de Cadastro Rápido de Cliente -->
+        <section class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6">Cadastro de Clientes</h2>
+            <p class="text-sm text-gray-500 mb-4">Adicione novos clientes que ainda não estão no sistema com todos os dados.</p>
+            <form id="addClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="clientName" name="clientName" required class="w-full">
+                </div>
+                <div>
+                    <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
+                    <input type="text" id="clientRG" name="clientRG" required class="w-full" placeholder="00.000.000-0">
+                </div>
+                <div>
+                    <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                    <input type="text" id="clientCPF" name="clientCPF" required class="w-full" placeholder="000.000.000-00">
+                </div>
+                <div>
+                    <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                    <input type="text" id="clientPhone" name="clientPhone" required class="w-full" placeholder="(DD) 99999-9999">
+                </div>
+                <!-- Nova linha para Rua, Número e Complemento -->
+                <div class="sm:col-span-2">
+                    <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+                    <input type="text" id="clientStreet" name="clientStreet" required class="w-full">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                        <input type="text" id="clientNumber" name="clientNumber" required class="w-full">
+                    </div>
+                    <div>
+                        <label for="clientComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
+                        <input type="text" id="clientComplement" name="clientComplement" class="w-full">
+                    </div>
+                </div>
+                <div>
+                    <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                    <input type="text" id="clientNeighborhood" name="clientNeighborhood" required class="w-full">
+                </div>
+                <div>
+                    <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                    <input type="text" id="clientCity" name="clientCity" required class="w-full">
+                </div>
+                <div class="flex items-end sm:col-span-2">
+                    <button type="submit" class="btn btn-primary w-full">Cadastrar Cliente</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Seção de Carteira de Clientes (NOVO) -->
+        <section class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6">Carteira de Clientes</h2>
+            <div class="mb-4">
+                <label for="clientCityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
+                <select id="clientCityFilterSelect" class="w-full">
+                    <option value="">Todas as Cidades</option>
+                </select>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endereço</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody" class="bg-white divide-y divide-gray-200">
+                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Seção de Vendas e Promissórias -->
+        <section class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6">Consultar Vendas e Promissórias</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="clientFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cliente</label>
+                    <select id="clientFilterSelect" class="w-full">
+                        <option value="">Todos os Clientes</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="cityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
+                    <select id="cityFilterSelect" class="w-full">
+                        <option value="">Todas as Cidades</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="salesListContainer" class="overflow-x-auto">
+                <!-- A tabela de vendas será renderizada aqui -->
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allSalesTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Linhas da tabela serão adicionadas dinamicamente -->
+                        <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Seção de Próximos Vencimentos (NOVO) -->
+        <section class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6">Próximos Vencimentos</h2>
+            <p class="text-sm text-gray-500 mb-4">Promissórias com vencimento nos próximos 30 dias.</p>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingDuesTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Linhas da tabela de próximos vencimentos serão adicionadas dinamicamente -->
+                        <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Seção de Estoque -->
+        <section class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6">Controle de Estoque</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Linhas da tabela de estoque serão adicionadas dinamicamente -->
+                        <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Seção de Registrar Pagamento -->
+        <section class="card">
+            <h2 class="text-2xl font-bold mb-6">Registrar Pagamento de Promissória</h2>
+            <form id="paymentForm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo da Promissória</label>
+                        <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required class="w-full">
+                    </div>
+                    <div>
+                        <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago</label>
+                        <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required class="w-full">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento (Opcional)</label>
+                        <input type="date" id="paymentNewDueDate" name="newDueDate" class="w-full">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="btn btn-primary">Registrar Pagamento</button>
+                </div>
+            </form>
+        </section>
+
+    </div>
+
+    <!-- Modal de Feedback (sucesso/erro) -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <p id="feedbackMessage" class="text-lg font-medium mb-4"></p>
+            <button id="closeModalBtn" class="btn btn-primary">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        // Substitua esta URL pela URL do seu Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvk_pMxhscYTIewjCuG3nqE6seyBqkBJj70PO3BztS6DdtUHaDdvR8JbwHgPqlnHCX8A/exec'; 
+
+        // Variáveis globais para armazenar dados
+        let sales = [];
+        let products = [];
+        let clients = [];
+        let cities = [];
+
+        // Elementos do DOM
+        const addClientForm = document.getElementById('addClientForm');
+        const paymentForm = document.getElementById('paymentForm');
+        const allSalesTableBody = document.getElementById('allSalesTableBody');
+        const upcomingDuesTableBody = document.getElementById('upcomingDuesTableBody');
+        const stockTableBody = document.getElementById('stockTableBody');
+        const clientsTableBody = document.getElementById('clientsTableBody'); // Novo
+        const clientFilterSelect = document.getElementById('clientFilterSelect');
+        const cityFilterSelect = document.getElementById('cityFilterSelect');
+        const clientCityFilterSelect = document.getElementById('clientCityFilterSelect'); // Novo
+        const clientPhoneInput = document.getElementById('clientPhone');
+        const clientRGInput = document.getElementById('clientRG'); // Novo
+        const clientCPFInput = document.getElementById('clientCPF'); // Novo
+
+        const feedbackModal = document.getElementById('feedbackModal');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        // Configura as máscaras de entrada usando IMask
+        IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
+        IMask(clientRGInput, { mask: '00.000.000-0' });
+        IMask(clientCPFInput, { mask: '000.000.000-00' });
+
+        // Função para mostrar o modal de feedback (substitui alert)
+        function showFeedbackModal(message, isSuccess = true) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.style.color = isSuccess ? '#10B981' : '#EF4444';
+            feedbackModal.style.display = 'flex';
+        }
+
+        // Função para fechar o modal
+        closeModalBtn.addEventListener('click', () => {
+            feedbackModal.style.display = 'none';
+        });
+
+        // Função para carregar os dados do Google Sheets
+        async function loadData() {
+            try {
+                allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                stockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                clientsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+
+                console.log('Fetching data from URL:', `${SCRIPT_URL}?type=get_all_data`);
+
+                const response = await fetch(`${SCRIPT_URL}?type=get_all_data`);
+                
+                if (!response.ok) {
+                    console.error('Network response was not ok:', response.status, response.statusText);
+                    throw new Error(`Erro do servidor: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                sales = data.sales || [];
+                products = data.products || [];
+                clients = data.clients || [];
+                
+                // Extrai as cidades únicas para os filtros
+                cities = [...new Set(clients.map(client => client.Cidade))].sort();
+
+                renderSales();
+                renderUpcomingDues(); // Chama a nova função de renderização
+                renderStock();
+                renderClients(); // Chama a nova função de renderização de clientes
+                populateClientFilter();
+                populateCityFilters(); // Atualizado para popular os dois filtros de cidade
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                console.error('Detalhes do erro de fetch:', error.message, error);
+                showFeedbackModal('Erro ao carregar os dados. Por favor, verifique a URL do Apps Script e sua conexão.', false);
+            }
+        }
+
+        // Função para popular o select de filtro de clientes
+        function populateClientFilter() {
+            clientFilterSelect.innerHTML = '<option value="">Todos os Clientes</option>';
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.ID;
+                option.textContent = client.Nome;
+                clientFilterSelect.appendChild(option);
+            });
+        }
+        
+        // Função para popular os selects de filtro de cidades
+        function populateCityFilters() {
+            const cityOptions = '<option value="">Todas as Cidades</option>' + cities.map(city => `<option value="${city}">${city}</option>`).join('');
+            cityFilterSelect.innerHTML = cityOptions;
+            clientCityFilterSelect.innerHTML = cityOptions;
+        }
+
+        // Função para renderizar a tabela de clientes (NOVO)
+        function renderClients() {
+            const selectedCity = clientCityFilterSelect.value;
+
+            let filteredClients = clients;
+            if (selectedCity) {
+                filteredClients = clients.filter(client => client.Cidade === selectedCity);
+            }
+            
+            clientsTableBody.innerHTML = '';
+            if (filteredClients.length === 0) {
+                clientsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>';
+                return;
+            }
+
+            filteredClients.forEach(client => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Rua}, ${client.Número} ${client.Complemento ? `(${client.Complemento})` : ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Cidade}</td>
+                `;
+                clientsTableBody.appendChild(row);
+            });
+        }
+        
+        // Funções de renderização
+        function renderSales() {
+            const selectedClientId = clientFilterSelect.value;
+            const selectedCity = cityFilterSelect.value;
+
+            let filteredSales = sales;
+
+            if (selectedClientId) {
+                const selectedClient = clients.find(c => c.ID == selectedClientId);
+                if (selectedClient) {
+                    filteredSales = filteredSales.filter(sale => sale.Cliente === selectedClient.Nome);
+                } else {
+                    filteredSales = []; // Nenhum cliente encontrado, retorna uma lista vazia
+                }
+            }
+            
+            if (selectedCity) {
+                const clientsInCity = clients.filter(c => c.Cidade === selectedCity).map(c => c.Nome);
+                filteredSales = filteredSales.filter(sale => clientsInCity.includes(sale.Cliente));
+            }
+            
+            allSalesTableBody.innerHTML = '';
+            if (filteredSales.length === 0) {
+                allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhuma venda encontrada.</td></tr>';
+                return;
+            }
+
+            filteredSales.forEach(sale => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale['Nº NF/Recibo'] || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.Cliente}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale['Data Vencimento']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Valor Total']).toFixed(2).replace('.', ',')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Saldo a Pagar']).toFixed(2).replace('.', ',')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <!-- Botões de ação, se necessário -->
+                    </td>
+                `;
+                allSalesTableBody.appendChild(row);
+            });
+        }
+        
+        // Função para renderizar a tabela de próximos vencimentos (NOVO)
+        function renderUpcomingDues() {
+            const today = new Date();
+            const thirtyDaysLater = new Date();
+            thirtyDaysLater.setDate(today.getDate() + 30);
+
+            // Filtra as vendas com saldo positivo e vencimento nos próximos 30 dias
+            const upcomingDues = sales.filter(sale => {
+                const dueDate = new Date(sale['Data Vencimento']);
+                const hasBalance = parseFloat(sale['Saldo a Pagar']) > 0;
+                const isUpcoming = dueDate >= today && dueDate <= thirtyDaysLater;
+                return hasBalance && isUpcoming;
+            });
+            
+            upcomingDuesTableBody.innerHTML = '';
+            if (upcomingDues.length === 0) {
+                upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum vencimento próximo.</td></tr>';
+                return;
+            }
+
+            upcomingDues.forEach(sale => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale['Nº NF/Recibo'] || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.Cliente}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale['Data Vencimento']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Saldo a Pagar']).toFixed(2).replace('.', ',')}</td>
+                `;
+                upcomingDuesTableBody.appendChild(row);
+            });
+        }
+
+        function renderStock() {
+            stockTableBody.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
+                `;
+                stockTableBody.appendChild(row);
+            });
+        }
+
+        // Funções de evento
+        addClientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const clientData = {
+                type: 'add_client',
+                data: {
+                    name: formData.get('clientName'),
+                    phone: formData.get('clientPhone'),
+                    rg: formData.get('clientRG'),
+                    cpf: formData.get('clientCPF'),
+                    street: formData.get('clientStreet'),
+                    number: formData.get('clientNumber'),
+                    complement: formData.get('clientComplement'),
+                    neighborhood: formData.get('clientNeighborhood'),
+                    city: formData.get('clientCity')
+                }
+            };
+
+            // A geração do ID é responsabilidade do Apps Script (backend)
+            console.log("Enviando dados do novo cliente para o servidor...");
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(clientData),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showFeedbackModal('Cliente cadastrado com sucesso! Recarregando dados...');
+                    e.target.reset();
+                    loadData();
+                } else {
+                    showFeedbackModal('Erro ao cadastrar cliente: ' + result.message, false);
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
+            }
+        });
+
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const paymentData = {
+                type: 'add_payment',
+                invoiceNumber: formData.get('invoiceNumber'),
+                amount: parseFloat(formData.get('amount')),
+                newDueDate: formData.get('newDueDate') || null
+            };
+
+            if (paymentData.amount <= 0 || !paymentData.invoiceNumber) {
+                showFeedbackModal('Por favor, preencha o número da promissória e o valor.', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(paymentData),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showFeedbackModal('Pagamento registrado com sucesso! Recarregando dados...');
+                    e.target.reset();
+                    loadData();
+                } else {
+                    showFeedbackModal('Erro ao registrar pagamento: ' + result.message, false);
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
+            }
+        });
+
+        // Eventos para atualização da tela
+        clientFilterSelect.addEventListener('change', renderSales);
+        cityFilterSelect.addEventListener('change', renderSales);
+        clientCityFilterSelect.addEventListener('change', renderClients); // Novo evento para a tabela de clientes
+
+        // Dispara a carga de dados ao carregar a página
+        loadData();
+
+        // Configura uma atualização automática a cada 30 segundos
+        setInterval(loadData, 30000);
     </script>
 </body>
 </html>

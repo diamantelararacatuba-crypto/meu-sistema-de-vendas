@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lançamento de Vendas</title>
+    <title>Lançamento de Vendas e Pagamentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Adicionando a biblioteca IMask para formatação automática -->
     <script src="https://unpkg.com/imask"></script>
     <style>
-        /* Estilos CSS adaptados para esta página */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -15,7 +15,7 @@
             color: #1f2937;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: auto;
             padding: 2rem;
         }
@@ -42,13 +42,6 @@
         .btn-primary:hover {
             background-color: #4338ca;
         }
-        .btn-secondary {
-            background-color: #e5e7eb;
-            color: #1f2937;
-        }
-        .btn-secondary:hover {
-            background-color: #d1d5db;
-        }
         input, select, textarea {
             border-radius: 0.5rem;
             border: 1px solid #d1d5db;
@@ -61,382 +54,290 @@
             border-color: #4f46e5;
             box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
         }
-        
-        /* Estilos para o modal de feedback */
-        .modal {
-            display: none;
+        /* Estilo para o modal de feedback */
+        .feedback-modal {
             position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .modal-content {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            text-align: center;
+        .feedback-modal.show {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
-<body class="p-8">
+<body class="p-4">
+
     <div class="container">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800">Lançamento de Vendas</h1>
-            <p class="mt-4 text-xl text-gray-600">
-                Lançamento de novas vendas e promissórias para controle.
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-indigo-800">App do Vendedor</h1>
+            <p class="mt-2 text-md text-gray-600">
+                Cadastre clientes, lance vendas e registre pagamentos.
             </p>
         </header>
 
-        <!-- Formulário Completo para Cadastro de Cliente (agora em primeiro lugar) -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Cadastro de Clientes</h2>
-            <p class="text-sm text-gray-500 mb-4">Adicione novos clientes que ainda não estão no sistema com todos os dados.</p>
-            <form id="quickClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Formulário de Cadastro de Clientes -->
+        <section class="card mb-8">
+            <h2 class="text-xl font-bold mb-4">Cadastro de Clientes</h2>
+            <form id="clientForm" class="space-y-4">
                 <div>
                     <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                    <input type="text" id="clientName" name="name" required class="w-full">
+                    <input type="text" id="clientName" name="name" required>
                 </div>
                 <div>
                     <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
-                    <input type="text" id="clientRG" name="rg" required class="w-full">
+                    <input type="text" id="clientRG" name="rg" required placeholder="00.000.000-0">
                 </div>
                 <div>
                     <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
-                    <input type="text" id="clientCPF" name="cpf" required class="w-full">
+                    <input type="text" id="clientCPF" name="cpf" required placeholder="000.000.000-00">
                 </div>
                 <div>
                     <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                    <input type="text" id="clientPhone" name="phone" required class="w-full" placeholder="(DD) 99999-9999">
+                    <input type="text" id="clientPhone" name="phone" required placeholder="(DD) 99999-9999">
                 </div>
-                <!-- Nova linha para Rua, Número e Complemento -->
-                <div class="sm:col-span-2">
+                <div>
                     <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
-                    <input type="text" id="clientStreet" name="street" required class="w-full">
+                    <input type="text" id="clientStreet" name="street" required>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
+                <!-- NOVO: Adicionando campos para número e complemento -->
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
                         <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                        <input type="text" id="clientNumber" name="number" required class="w-full">
+                        <input type="text" id="clientNumber" name="number">
                     </div>
-                    <div>
+                    <div class="w-1/2">
                         <label for="clientComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-                        <input type="text" id="clientComplement" name="complement" class="w-full">
+                        <input type="text" id="clientComplement" name="complement">
                     </div>
                 </div>
                 <div>
                     <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-                    <input type="text" id="clientNeighborhood" name="neighborhood" required class="w-full">
+                    <input type="text" id="clientNeighborhood" name="neighborhood" required>
                 </div>
                 <div>
                     <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                    <input type="text" id="clientCity" name="city" required class="w-full">
+                    <input type="text" id="clientCity" name="city" required>
                 </div>
-                <div class="flex items-end sm:col-span-2">
-                    <button type="submit" class="btn btn-primary w-full">Cadastrar Cliente</button>
-                </div>
+                <button type="submit" class="btn btn-primary w-full">Adicionar Cliente</button>
             </form>
         </section>
 
-        <!-- Formulário de Vendas (agora em segundo lugar) -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Lançamento de Venda/Promissória</h2>
-            <form id="saleForm" class="mb-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                    <div>
-                        <label for="saleDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Venda</label>
-                        <input type="date" id="saleDate" name="date" required class="w-full">
-                    </div>
-                    <div>
-                        <label for="saleInvoice" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo (Opcional)</label>
-                        <input type="text" id="saleInvoice" name="invoice" class="w-full">
-                    </div>
-                    <div>
-                        <label for="saleClient" class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-                        <!-- Select para selecionar um cliente cadastrado -->
-                        <select id="saleClient" name="client" required class="w-full">
-                            <option value="">Carregando Clientes...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="promissoryDueDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
-                        <input type="date" id="promissoryDueDate" name="dueDate" required class="w-full">
-                    </div>
+        <!-- Formulário de Lançamento de Venda -->
+        <section class="card mb-8">
+            <h2 class="text-xl font-bold mb-4">Lançamento de Venda</h2>
+            <form id="saleForm" class="space-y-4">
+                <div>
+                    <label for="saleDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Venda</label>
+                    <input type="date" id="saleDate" name="date" required>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end mb-4">
-                    <div>
-                        <label for="productCode" class="block text-sm font-medium text-gray-700 mb-1">Código do Produto</label>
-                        <input type="text" id="productCode" placeholder="Digite o código" class="w-full">
-                    </div>
-                    <div>
-                        <label for="productQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
-                        <input type="number" id="productQuantity" min="1" value="1" class="w-full">
-                    </div>
-                    <button type="button" id="addItemBtn" class="btn btn-secondary">Adicionar Item</button>
+                <div>
+                    <label for="saleInvoice" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo</label>
+                    <input type="text" id="saleInvoice" name="invoice" required>
                 </div>
-                
-                <h3 class="text-lg font-bold mt-8 mb-4">Itens da Venda</h3>
-                <div id="saleItemsList" class="mb-4">
-                    <p class="text-gray-500">Nenhum item adicionado.</p>
+                <div>
+                    <label for="saleClientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="saleClientName" name="clientName" required>
                 </div>
-                
-                <div class="text-right text-2xl font-bold mb-8">
-                    Total: <span id="saleTotalValue">R$ 0,00</span>
+                <div>
+                    <label for="saleItems" class="block text-sm font-medium text-gray-700 mb-1">Itens da Venda (JSON)</label>
+                    <textarea id="saleItems" name="items" rows="4" required placeholder='Ex: [{"item":"Arroz", "quantidade":5}]'></textarea>
                 </div>
-                
+                <div>
+                    <label for="saleTotal" class="block text-sm font-medium text-gray-700 mb-1">Valor Total (R$)</label>
+                    <input type="number" id="saleTotal" name="totalValue" step="0.01" min="0" required>
+                </div>
+                <div>
+                    <label for="promissoryDueDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                    <input type="date" id="promissoryDueDate" name="dueDate" required>
+                </div>
                 <button type="submit" class="btn btn-primary w-full">Finalizar Venda</button>
             </form>
         </section>
 
+        <!-- Formulário de Registro de Pagamento -->
+        <section class="card">
+            <h2 class="text-xl font-bold mb-4">Registro de Pagamento</h2>
+            <form id="paymentForm" class="space-y-4">
+                <div>
+                    <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo</label>
+                    <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required>
+                </div>
+                <div>
+                    <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago (R$)</label>
+                    <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div>
+                    <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento</label>
+                    <input type="date" id="paymentNewDueDate" name="newDueDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Registrar Pagamento</button>
+            </form>
+        </section>
     </div>
 
-    <!-- Modal de Feedback (sucesso/erro) -->
-    <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-            <p id="feedbackMessage" class="text-lg font-medium mb-4"></p>
-            <button id="closeModalBtn" class="btn btn-primary">Fechar</button>
-        </div>
+    <!-- Modal de Feedback -->
+    <div id="feedbackModal" class="feedback-modal text-center">
+        <p id="feedbackMessage"></p>
     </div>
 
     <script>
-        // Substitua esta URL pela URL do seu Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydd_Pw_Xq6_ipTnopZ9-fvwJNrVi1aO1-1RbxmcImcSW8A8QVWT4bfjJFectS1omhsGw/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUHvf_KSgH3nCykEeiM1bKbC2JyJMzNHXSfbww0AlZ9WJHYpB0LuDNKEmOMLc557FOpA/exec';
 
-        // Variáveis globais para armazenar dados
-        let products = [];
-        let clients = [];
-        let itemsForSale = [];
-
-        // Elementos do DOM
+        const clientForm = document.getElementById('clientForm');
         const saleForm = document.getElementById('saleForm');
-        const saleClientSelect = document.getElementById('saleClient');
-        const productCodeInput = document.getElementById('productCode');
-        const productQuantityInput = document.getElementById('productQuantity');
-        const addItemBtn = document.getElementById('addItemBtn');
-        const saleItemsList = document.getElementById('saleItemsList');
-        const saleTotalValueSpan = document.getElementById('saleTotalValue');
-        const quickClientForm = document.getElementById('quickClientForm');
-        const clientPhoneInput = document.getElementById('clientPhone');
+        const paymentForm = document.getElementById('paymentForm');
 
+        // Referência para o modal de feedback
         const feedbackModal = document.getElementById('feedbackModal');
         const feedbackMessage = document.getElementById('feedbackMessage');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-
-        // Configura a máscara de telefone usando IMask
-        IMask(clientPhoneInput, {
-            mask: '(00) 00000-0000'
-        });
-
-        // Função para mostrar o modal de feedback (substitui alert)
-        function showFeedbackModal(message, isSuccess = true) {
-            feedbackMessage.textContent = message;
-            feedbackMessage.style.color = isSuccess ? '#10B981' : '#EF4444';
-            feedbackModal.style.display = 'flex';
-        }
-
-        // Função para fechar o modal
-        closeModalBtn.addEventListener('click', () => {
-            feedbackModal.style.display = 'none';
-        });
         
-        // Função para carregar os dados (produtos e clientes) do Google Sheets via GET
-        async function loadData() {
+        // NOVO: Referência para os campos de entrada do cliente
+        const clientRGInput = document.getElementById('clientRG');
+        const clientCPFInput = document.getElementById('clientCPF');
+        const clientPhoneInput = document.getElementById('clientPhone');
+
+        // NOVO: Aplica as máscaras de formatação com a biblioteca IMask
+        IMask(clientRGInput, { mask: '00.000.000-0' });
+        IMask(clientCPFInput, { mask: '000.000.000-00' });
+        IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
+
+        // Função para exibir o modal de feedback
+        function showFeedbackModal(message, isSuccess) {
+            feedbackMessage.textContent = message;
+            feedbackModal.classList.add('show');
+            // Remove a classe 'show' após 3 segundos para esconder o modal
+            setTimeout(() => {
+                feedbackModal.classList.remove('show');
+            }, 3000);
+        }
+
+        // Listener para o formulário de cliente
+        clientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                type: 'cliente',
+                name: formData.get('name'),
+                rg: formData.get('rg'),
+                cpf: formData.get('cpf'),
+                phone: formData.get('phone'), // NOVO: Adicionando o telefone
+                street: formData.get('street'),
+                number: formData.get('number'), // NOVO: Adicionando o número da residência
+                complement: formData.get('complement'), // NOVO: Adicionando o complemento
+                neighborhood: formData.get('neighborhood'),
+                city: formData.get('city')
+            };
+
             try {
-                const response = await fetch(`${SCRIPT_URL}?type=get_all_data`);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro do servidor: ${response.statusText}`);
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showFeedbackModal('Cliente cadastrado com sucesso!');
+                    e.target.reset();
+                } else {
+                    showFeedbackModal('Erro ao cadastrar cliente: ' + result.message);
                 }
-                
-                const data = await response.json();
-                
-                products = data.products || [];
-                clients = data.clients || [];
-                
-                populateClientSelect();
             } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                showFeedbackModal('Erro ao carregar os dados. Por favor, verifique a URL do Apps Script e a sua conexão.', false);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                console.error('Erro:', error);
             }
-        }
-
-        // Função para popular o select de clientes
-        function populateClientSelect() {
-            saleClientSelect.innerHTML = '<option value="">Selecione o Cliente</option>';
-            clients.forEach(client => {
-                const option = document.createElement('option');
-                // Use o ID do cliente como valor da opção
-                option.value = client.ID;
-                option.textContent = client.Nome;
-                saleClientSelect.appendChild(option);
-            });
-        }
-
-        // Função para adicionar item à lista de vendas
-        addItemBtn.addEventListener('click', () => {
-            const productCode = productCodeInput.value.trim();
-            const quantity = parseInt(productQuantityInput.value, 10);
-
-            if (!productCode || isNaN(quantity) || quantity <= 0) {
-                showFeedbackModal('Por favor, preencha o código e a quantidade.', false);
-                return;
-            }
-
-            const product = products.find(p => p.Código === productCode);
-            if (!product) {
-                showFeedbackModal('Produto não encontrado.', false);
-                return;
-            }
-
-            // Verifica se o item já foi adicionado para atualizar a quantidade
-            const existingItem = itemsForSale.find(item => item.code === productCode);
-            if (existingItem) {
-                existingItem.quantity += quantity;
-                existingItem.total = existingItem.quantity * product.Preço;
-            } else {
-                const item = {
-                    code: product.Código,
-                    description: product.Descrição,
-                    price: parseFloat(product.Preço),
-                    quantity: quantity,
-                    total: parseFloat(product.Preço) * quantity
-                };
-                itemsForSale.push(item);
-            }
-            
-            renderSaleItems();
-            productCodeInput.value = '';
-            productQuantityInput.value = '1';
         });
 
-        // Função para renderizar a lista de itens da venda
-        function renderSaleItems() {
-            saleItemsList.innerHTML = '';
-            let totalValue = 0;
-
-            if (itemsForSale.length === 0) {
-                saleItemsList.innerHTML = '<p class="text-gray-500">Nenhum item adicionado.</p>';
-            } else {
-                itemsForSale.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'border-b', 'border-gray-200');
-                    itemElement.innerHTML = `
-                        <p class="text-gray-700">${item.description} (${item.code}) - ${item.quantity}x</p>
-                        <p class="font-bold">R$ ${item.total.toFixed(2).replace('.', ',')}</p>
-                    `;
-                    saleItemsList.appendChild(itemElement);
-                    totalValue += item.total;
-                });
-            }
-
-            saleTotalValueSpan.textContent = `R$ ${totalValue.toFixed(2).replace('.', ',')}`;
-        }
-
-        // Event listener para o formulário de venda
+        // Listener para o formulário de venda
         saleForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (itemsForSale.length === 0) {
-                showFeedbackModal('Por favor, adicione pelo menos um item à venda.', false);
-                return;
-            }
-            
             const formData = new FormData(e.target);
-            const clientID = formData.get('client');
-            const client = clients.find(c => c.ID == clientID);
-            const clientName = client ? client.Nome : 'Cliente não encontrado';
-
-            const saleData = {
-                type: 'add_sale',
+            const data = {
+                type: 'venda',
                 invoice: formData.get('invoice'),
                 date: formData.get('date'),
-                client: clientName,
-                items: JSON.stringify(itemsForSale),
-                totalValue: parseFloat(saleTotalValueSpan.textContent.replace('R$ ', '').replace(',', '.')),
+                clientName: formData.get('clientName'),
+                items: JSON.parse(formData.get('items')),
+                totalValue: parseFloat(formData.get('totalValue')),
                 dueDate: formData.get('dueDate')
             };
 
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify(saleData),
+                    body: JSON.stringify(data),
                     headers: { 'Content-Type': 'application/json' }
                 });
-
                 const result = await response.json();
-
                 if (result.status === 'success') {
                     showFeedbackModal('Venda registrada com sucesso!');
                     e.target.reset();
-                    itemsForSale = [];
-                    renderSaleItems();
-                    loadData(); // Recarrega os dados para garantir que tudo está sincronizado
                 } else {
-                    showFeedbackModal('Erro ao registrar venda: ' + result.message, false);
+                    showFeedbackModal('Erro ao registrar venda: ' + result.message);
                 }
             } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet ou a URL do Apps Script.', false);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                console.error('Erro:', error);
             }
         });
 
-        // Event listener para o formulário de cadastro de cliente
-        quickClientForm.addEventListener('submit', async (e) => {
+        // Listener para o formulário de pagamento
+        paymentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const formData = new FormData(e.target);
-            const clientData = {
-                type: 'add_client',
-                data: {
-                    name: formData.get('name'),
-                    rg: formData.get('rg'),
-                    cpf: formData.get('cpf'),
-                    phone: formData.get('phone'),
-                    street: formData.get('street'),
-                    number: formData.get('number'),
-                    complement: formData.get('complement'),
-                    neighborhood: formData.get('neighborhood'),
-                    city: formData.get('city')
-                }
+            const invoiceNumber = formData.get('invoiceNumber');
+            const amount = parseFloat(formData.get('amount'));
+            const newDueDate = formData.get('newDueDate');
+
+            // Validação simples
+            if (invoiceNumber.trim() === '' || amount <= 0 || !newDueDate) {
+                showFeedbackModal('Por favor, preencha todos os campos corretamente.');
+                return;
+            }
+
+            const data = {
+                type: 'pagamento',
+                invoiceNumber: invoiceNumber,
+                amount: amount,
+                newDueDate: newDueDate
             };
-            
+
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify(clientData),
+                    body: JSON.stringify(data),
                     headers: { 'Content-Type': 'application/json' }
                 });
-
                 const result = await response.json();
-
                 if (result.status === 'success') {
-                    showFeedbackModal('Cliente cadastrado com sucesso! Recarregando lista...');
+                    showFeedbackModal('Pagamento registrado com sucesso!');
                     e.target.reset();
-                    loadData(); // Recarrega os dados para que o novo cliente apareça no select
                 } else {
-                    showFeedbackModal('Erro ao cadastrar cliente: ' + result.message, false);
+                    showFeedbackModal('Erro ao registrar pagamento: ' + result.message);
                 }
             } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                console.error('Erro:', error);
             }
         });
 
-        // Configura a data de hoje no campo de data da venda
+        // Configuração para a data de hoje no campo de data da venda
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('saleDate').value = today;
+            const saleDateInput = document.getElementById('saleDate');
+            if (saleDateInput) {
+                saleDateInput.value = today;
+            }
         });
-        
-        // Carrega os dados iniciais
-        loadData();
-
     </script>
 </body>
 </html>
