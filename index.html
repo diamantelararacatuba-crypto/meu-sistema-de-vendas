@@ -43,7 +43,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center justify-content-center p-4">
 
     <!-- Container principal -->
     <div class="container bg-white rounded-3xl shadow-xl p-8 max-w-4xl w-full">
@@ -229,8 +229,9 @@
     </div>
 
     <script>
+        // A URL da API do Google Apps Script
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz-COaCEKwCbL521gv3PIQXbj3-HWSYLMRyIoGewaiPuErxXhSRfsAn58yjOaE3_Pr_/exec';
-
+        
         // Variáveis de elementos do DOM
         const mainMenu = document.getElementById('main-menu');
         const contentSectionsContainer = document.getElementById('content-sections-container');
@@ -267,7 +268,8 @@
                 appData = result;
                 console.log('Dados carregados com sucesso:', appData);
             } catch (error) {
-                console.error('Falha ao carregar dados do servidor.');
+                console.error('Falha ao carregar dados do servidor:', error);
+                throw error;
             }
         }
 
@@ -303,7 +305,6 @@
             if (clientRGInput) IMask(clientRGInput, { mask: '00.000.000-0' });
             if (clientCPFInput) IMask(clientCPFInput, { mask: '000.000.000-00' });
             if (clientPhoneInput) IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
-
 
             saveClientBtn.addEventListener('click', async () => {
                 statusMessage.textContent = 'Salvando cliente...';
@@ -416,9 +417,14 @@
 
             // Event listener para quando a seção é exibida
             document.getElementById('view-clients').addEventListener('section-visible', async () => {
-                await loadData();
-                populateCityFilter();
-                renderClients('all');
+                try {
+                    await loadData();
+                    populateCityFilter();
+                    renderClients('all');
+                } catch (error) {
+                    const clientsListDiv = document.getElementById('clients-list');
+                    clientsListDiv.innerHTML = `<div class="text-center text-red-500 p-4 mt-4">Não foi possível carregar os dados. Verifique a URL da API.</div>`;
+                }
             });
         }
 
@@ -525,8 +531,13 @@
             };
 
             document.getElementById('upcoming-due-dates').addEventListener('section-visible', async () => {
-                await loadData();
-                renderUpcoming();
+                try {
+                    await loadData();
+                    renderUpcoming();
+                } catch (error) {
+                    const upcomingListDiv = document.getElementById('upcoming-list');
+                    upcomingListDiv.innerHTML = `<div class="text-center text-red-500 p-4 mt-4">Não foi possível carregar os dados. Verifique a URL da API.</div>`;
+                }
             });
         }
 
@@ -664,27 +675,22 @@
                             invoiceDetailsDiv.innerHTML = `<div class="text-center text-gray-500 p-4">Nota fiscal não encontrada.</div>`;
                         }
                     } catch (error) {
-                        invoiceDetailsDiv.innerHTML = `<div class="text-center text-gray-500 p-4">Erro ao buscar nota. Tente novamente.</div>`;
+                        invoiceDetailsDiv.innerHTML = `<div class="text-center text-red-500 p-4">Erro ao buscar a nota fiscal.</div>`;
                     }
                 } else {
                     invoiceDetailsDiv.innerHTML = `
                         <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
                             <span class="text-4xl">🧾</span>
                             <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
-                        </div>
-                    `;
+                        </div>`;
                 }
             });
         }
         
-        // --- Funções de Inicialização e Event Listeners ---
-        
-        // Adiciona os event listeners para os botões de ação do menu principal
+        // Event listeners para os botões do menu
         actionButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                // Esconde o menu principal
                 mainMenu.classList.add('hidden');
-                // Mostra o container das seções de conteúdo
                 contentSectionsContainer.classList.remove('hidden');
 
                 const target = e.currentTarget.dataset.target;
@@ -709,7 +715,6 @@
         
         // Dispara a carga de dados e setup das seções ao carregar a página
         window.onload = function() {
-            // Não é necessário carregar os dados aqui, pois cada seção fará isso de forma independente.
             setupRegisterClientSection();
             setupViewClientsSection();
             setupPromissorySalesSection();
