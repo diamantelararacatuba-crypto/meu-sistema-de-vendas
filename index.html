@@ -82,201 +82,376 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             text-align: center;
         }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background-color: #f9fafb;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body class="p-8">
 
     <div class="container">
         <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800">Sistema de Gestão Financeira</h1>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800">Sistema de Gestão</h1>
             <p class="mt-4 text-xl text-gray-600">
-                Gerencie vendas, clientes, estoque e finanças de forma simples e eficaz.
+                Escolha uma ação para começar.
             </p>
         </header>
 
-        <!-- Seção de Cadastro Rápido de Cliente -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Cadastro de Clientes</h2>
-            <p class="text-sm text-gray-500 mb-4">Adicione novos clientes que ainda não estão no sistema com todos os dados.</p>
-            <form id="addClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                    <input type="text" id="clientName" name="clientName" required class="w-full">
-                </div>
-                <div>
-                    <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
-                    <input type="text" id="clientRG" name="clientRG" required class="w-full" placeholder="00.000.000-0">
-                </div>
-                <div>
-                    <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
-                    <input type="text" id="clientCPF" name="clientCPF" required class="w-full" placeholder="000.000.000-00">
-                </div>
-                <div>
-                    <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                    <input type="text" id="clientPhone" name="clientPhone" required class="w-full" placeholder="(DD) 99999-9999">
-                </div>
-                <!-- Nova linha para Rua, Número e Complemento -->
-                <div class="sm:col-span-2">
-                    <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
-                    <input type="text" id="clientStreet" name="clientStreet" required class="w-full">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+        <!-- Seção de Botões Principais -->
+        <section id="main-menu" class="card mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-center">Menu Principal</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <button class="action-button" data-target="section-add-client">
+                    <span class="text-4xl">👨‍💻</span>
+                    <span class="mt-2 text-lg font-semibold">Cadastrar Cliente</span>
+                </button>
+                <button class="action-button" data-target="section-client-list">
+                    <span class="text-4xl">👥</span>
+                    <span class="mt-2 text-lg font-semibold">Ver Clientes</span>
+                </button>
+                <button class="action-button" data-target="section-sales">
+                    <span class="text-4xl">📈</span>
+                    <span class="mt-2 text-lg font-semibold">Vendas e Promissórias</span>
+                </button>
+                <button class="action-button" data-target="section-upcoming-dues">
+                    <span class="text-4xl">📅</span>
+                    <span class="mt-2 text-lg font-semibold">Próximos Vencimentos</span>
+                </button>
+                <button class="action-button" data-target="section-stock">
+                    <span class="text-4xl">📦</span>
+                    <span class="mt-2 text-lg font-semibold">Controle de Estoque</span>
+                </button>
+                <button class="action-button" data-target="section-payment">
+                    <span class="text-4xl">💰</span>
+                    <span class="mt-2 text-lg font-semibold">Registrar Pagamento</span>
+                </button>
+                <button class="action-button" data-target="section-invoice-entry">
+                    <span class="text-4xl">📄</span>
+                    <span class="mt-2 text-lg font-semibold">Entrada de Nota Fiscal</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Seções de Conteúdo (Inicialmente ocultas) -->
+        <div id="content-sections" class="hidden">
+            <!-- Botão de Voltar ao Menu -->
+            <button id="backToMenuBtn" class="btn btn-secondary mb-8">← Voltar ao Menu</button>
+
+            <!-- Seção: Cadastrar Cliente -->
+            <section id="section-add-client" class="card mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Cadastro de Clientes</h2>
+                <p class="text-sm text-gray-500 mb-4">Adicione novos clientes que ainda não estão no sistema com todos os dados.</p>
+                <form id="addClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                        <input type="text" id="clientNumber" name="clientNumber" required class="w-full">
+                        <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                        <input type="text" id="clientName" name="clientName" required class="w-full">
                     </div>
                     <div>
-                        <label for="clientComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-                        <input type="text" id="clientComplement" name="clientComplement" class="w-full">
+                        <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
+                        <input type="text" id="clientRG" name="clientRG" required class="w-full" placeholder="00.000.000-0">
                     </div>
-                </div>
-                <div>
-                    <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-                    <input type="text" id="clientNeighborhood" name="clientNeighborhood" required class="w-full">
-                </div>
-                <div>
-                    <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                    <input type="text" id="clientCity" name="clientCity" required class="w-full">
-                </div>
-                <div class="flex items-end sm:col-span-2">
-                    <button type="submit" class="btn btn-primary w-full">Cadastrar Cliente</button>
-                </div>
-            </form>
-        </section>
+                    <div>
+                        <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                        <input type="text" id="clientCPF" name="clientCPF" required class="w-full" placeholder="000.000.000-00">
+                    </div>
+                    <div>
+                        <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                        <input type="text" id="clientPhone" name="clientPhone" required class="w-full" placeholder="(DD) 99999-9999">
+                    </div>
+                    <!-- Nova linha para Rua, Número e Complemento -->
+                    <div class="sm:col-span-2">
+                        <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+                        <input type="text" id="clientStreet" name="clientStreet" required class="w-full">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                            <input type="text" id="clientNumber" name="clientNumber" required class="w-full">
+                        </div>
+                        <div>
+                            <label for="clientComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
+                            <input type="text" id="clientComplement" name="clientComplement" class="w-full">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                        <input type="text" id="clientNeighborhood" name="clientNeighborhood" required class="w-full">
+                    </div>
+                    <div>
+                        <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                        <input type="text" id="clientCity" name="clientCity" required class="w-full">
+                    </div>
+                    <div class="flex items-end sm:col-span-2">
+                        <button type="submit" class="btn btn-primary w-full">Cadastrar Cliente</button>
+                    </div>
+                </form>
+            </section>
 
-        <!-- Seção de Carteira de Clientes (NOVO) -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Carteira de Clientes</h2>
-            <div class="mb-4">
-                <label for="clientCityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
-                <select id="clientCityFilterSelect" class="w-full">
-                    <option value="">Todas as Cidades</option>
-                </select>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endereço</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clientsTableBody" class="bg-white divide-y divide-gray-200">
-                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Seção de Vendas e Promissórias -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Consultar Vendas e Promissórias</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="clientFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cliente</label>
-                    <select id="clientFilterSelect" class="w-full">
-                        <option value="">Todos os Clientes</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="cityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
-                    <select id="cityFilterSelect" class="w-full">
-                        <option value="">Todas as Cidades</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div id="salesListContainer" class="overflow-x-auto">
-                <!-- A tabela de vendas será renderizada aqui -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allSalesTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Linhas da tabela serão adicionadas dinamicamente -->
-                        <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Seção de Próximos Vencimentos (NOVO) -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Próximos Vencimentos</h2>
-            <p class="text-sm text-gray-500 mb-4">Promissórias com vencimento nos próximos 30 dias.</p>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="upcomingDuesTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Linhas da tabela de próximos vencimentos serão adicionadas dinamicamente -->
-                        <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Seção de Estoque -->
-        <section class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6">Controle de Estoque</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stockTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Linhas da tabela de estoque serão adicionadas dinamicamente -->
-                        <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Seção de Registrar Pagamento -->
-        <section class="card">
-            <h2 class="text-2xl font-bold mb-6">Registrar Pagamento de Promissória</h2>
-            <form id="paymentForm">
+            <!-- Seção: Carteira de Clientes -->
+            <section id="section-client-list" class="card mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Carteira de Clientes</h2>
+                <!-- Nova seção de filtro para clientes com saldo -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo da Promissória</label>
-                        <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required class="w-full">
+                        <label for="clientCityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
+                        <select id="clientCityFilterSelect" class="w-full">
+                            <option value="">Todas as Cidades</option>
+                        </select>
                     </div>
                     <div>
-                        <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago</label>
-                        <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required class="w-full">
+                        <label for="clientBalanceFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Saldo</label>
+                        <select id="clientBalanceFilterSelect" class="w-full">
+                            <option value="all">Todos os Clientes</option>
+                            <option value="due">Clientes com Saldo a Pagar</option>
+                            <option value="paid">Clientes com Saldo Pago</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endereço</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Nova Tabela: Clientes com Vencimentos Próximos -->
+                <h3 class="text-xl font-bold mt-8 mb-4">Clientes com Vencimentos Próximos</h3>
+                <p class="text-sm text-gray-500 mb-4">Clientes que possuem uma ou mais promissórias com vencimento nos próximos 30 dias.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total a Pagar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcomingClientsTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Seção: Vendas e Promissórias -->
+            <section id="section-sales" class="card mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Consultar Vendas e Promissórias</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="clientFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cliente</label>
+                        <select id="clientFilterSelect" class="w-full">
+                            <option value="">Todos os Clientes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
+                        <select id="cityFilterSelect" class="w-full">
+                            <option value="">Todas as Cidades</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="salesListContainer" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allSalesTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Seção: Próximos Vencimentos -->
+            <section id="section-upcoming-dues" class="card mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Próximos Vencimentos</h2>
+                <p class="text-sm text-gray-500 mb-4">Promissórias com vencimento nos próximos 30 dias.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcomingDuesTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Seção: Estoque -->
+            <section id="section-stock" class="card mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Controle de Estoque</h2>
+                <!-- Formulário de Cadastro de Produtos -->
+                <h3 class="text-xl font-bold mb-4 mt-6">Cadastro de Produtos</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                    Adicione novos produtos ao estoque. O código é opcional.
+                </p>
+                <form id="addProductForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                        <select id="productCategory" name="productCategory" required class="w-full">
+                            <option value="Para Casa">Produtos para Casa</option>
+                            <option value="Alimentício">Produtos Alimentícios</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="productCode" class="block text-sm font-medium text-gray-700 mb-1">Código do Produto (Opcional)</label>
+                        <input type="text" id="productCode" name="productCode" class="w-full">
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento (Opcional)</label>
-                        <input type="date" id="paymentNewDueDate" name="newDueDate" class="w-full">
+                        <label for="productDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                        <input type="text" id="productDescription" name="productDescription" required class="w-full">
+                    </div>
+                    <div>
+                        <label for="productStock" class="block text-sm font-medium text-gray-700 mb-1">Estoque Inicial</label>
+                        <input type="number" id="productStock" name="productStock" min="0" required class="w-full">
+                    </div>
+                    <div>
+                        <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
+                        <input type="number" id="productPrice" name="productPrice" step="0.01" min="0" required class="w-full">
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-primary w-full">Adicionar Produto</button>
+                    </div>
+                </form>
+
+                <!-- Nova Seção: Saída Manual de Produto -->
+                <h3 class="text-xl font-bold mb-4 mt-6">Saída Manual de Produto</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                    Retire produtos do estoque para a montagem de cestas ou para outros fins.
+                </p>
+                <form id="removeProductForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label for="removeProductSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione o Produto</label>
+                        <select id="removeProductSelect" name="productCode" required class="w-full">
+                            <!-- Opções serão preenchidas via JavaScript -->
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="removeQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade a Retirar</label>
+                        <input type="number" id="removeQuantity" name="quantity" min="1" required class="w-full">
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-primary w-full">Retirar do Estoque</button>
+                    </div>
+                </form>
+
+                <!-- Tabelas de Estoque Separadas por Categoria -->
+                <h3 class="text-xl font-bold mb-4 mt-8">Estoque Atual - Produtos para Casa</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                            </tr>
+                        </thead>
+                        <tbody id="homeStockTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto para casa encontrado.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-xl font-bold mb-4 mt-8">Estoque Atual - Produtos Alimentícios</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                            </tr>
+                        </thead>
+                        <tbody id="foodStockTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto alimentício encontrado.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Seção: Registrar Pagamento -->
+            <section id="section-payment" class="card hidden">
+                <h2 class="text-2xl font-bold mb-6">Registrar Pagamento de Promissória</h2>
+                <form id="paymentForm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo da Promissória</label>
+                            <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required class="w-full">
+                        </div>
+                        <div>
+                            <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago</label>
+                            <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required class="w-full">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento (Opcional)</label>
+                            <input type="date" id="paymentNewDueDate" name="newDueDate" class="w-full">
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn btn-primary">Registrar Pagamento</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Nova Seção: Entrada de Nota Fiscal -->
+            <section id="section-invoice-entry" class="card hidden">
+                <h2 class="text-2xl font-bold mb-6">Entrada de Nota Fiscal</h2>
+                <p class="text-sm text-gray-500 mb-4">Digite o número da Nota Fiscal para preencher automaticamente os produtos para entrada no estoque. (Simulação)</p>
+                <form id="invoiceSearchForm" class="flex gap-4 mb-6">
+                    <input type="text" id="invoiceNumber" name="invoiceNumber" placeholder="Nº da Nota Fiscal" required class="flex-1">
+                    <button type="submit" class="btn btn-primary">Buscar Nota</button>
+                </form>
+                <div id="invoiceDetails">
+                    <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
+                        <span class="text-4xl">🧾</span>
+                        <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
                     </div>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-primary">Registrar Pagamento</button>
-                </div>
-            </form>
-        </section>
+            </section>
 
+        </div>
     </div>
 
     <!-- Modal de Feedback (sucesso/erro) -->
@@ -289,7 +464,7 @@
 
     <script>
         // Substitua esta URL pela URL do seu Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvk_pMxhscYTIewjCuG3nqE6seyBqkBJj70PO3BztS6DdtUHaDdvR8JbwHgPqlnHCX8A/exec'; 
+        const https:https://script.google.com/macros/s/AKfycbzSnbezZDoznyTRjMJzEV2TJnjLuUAsd5BRN0ghtA936t2L96QgzTHz1f8DM7HK70mM/exec'; 
 
         // Variáveis globais para armazenar dados
         let sales = [];
@@ -298,18 +473,33 @@
         let cities = [];
 
         // Elementos do DOM
+        const mainMenu = document.getElementById('main-menu');
+        const contentSectionsContainer = document.getElementById('content-sections');
+        const allContentSections = document.querySelectorAll('#content-sections section');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+        const actionButtons = document.querySelectorAll('.action-button');
+
         const addClientForm = document.getElementById('addClientForm');
+        const addProductForm = document.getElementById('addProductForm');
+        const removeProductForm = document.getElementById('removeProductForm'); // Novo formulário de saída
         const paymentForm = document.getElementById('paymentForm');
+        const invoiceSearchForm = document.getElementById('invoiceSearchForm');
+        const invoiceDetailsDiv = document.getElementById('invoiceDetails');
+
         const allSalesTableBody = document.getElementById('allSalesTableBody');
         const upcomingDuesTableBody = document.getElementById('upcomingDuesTableBody');
-        const stockTableBody = document.getElementById('stockTableBody');
-        const clientsTableBody = document.getElementById('clientsTableBody'); // Novo
+        const homeStockTableBody = document.getElementById('homeStockTableBody');
+        const foodStockTableBody = document.getElementById('foodStockTableBody');
+        const clientsTableBody = document.getElementById('clientsTableBody');
+        const upcomingClientsTableBody = document.getElementById('upcomingClientsTableBody'); // Nova tabela
         const clientFilterSelect = document.getElementById('clientFilterSelect');
         const cityFilterSelect = document.getElementById('cityFilterSelect');
-        const clientCityFilterSelect = document.getElementById('clientCityFilterSelect'); // Novo
+        const clientCityFilterSelect = document.getElementById('clientCityFilterSelect');
+        const clientBalanceFilterSelect = document.getElementById('clientBalanceFilterSelect'); // Novo filtro
         const clientPhoneInput = document.getElementById('clientPhone');
-        const clientRGInput = document.getElementById('clientRG'); // Novo
-        const clientCPFInput = document.getElementById('clientCPF'); // Novo
+        const clientRGInput = document.getElementById('clientRG');
+        const clientCPFInput = document.getElementById('clientCPF');
+        const removeProductSelect = document.getElementById('removeProductSelect');
 
         const feedbackModal = document.getElementById('feedbackModal');
         const feedbackMessage = document.getElementById('feedbackMessage');
@@ -320,7 +510,33 @@
         IMask(clientRGInput, { mask: '00.000.000-0' });
         IMask(clientCPFInput, { mask: '000.000.000-00' });
 
-        // Função para mostrar o modal de feedback (substitui alert)
+        // Simulação de banco de dados de notas fiscais
+        const dummyInvoices = {
+            'NF-001': {
+                supplier: 'Fornecedor A',
+                products: [
+                    { code: 'PROD-123', description: 'Parafusos', quantity: 100, price: 0.5 },
+                    { code: 'PROD-456', description: 'Tinta Branca 1L', quantity: 50, price: 25.00 }
+                ]
+            },
+            'NF-002': {
+                supplier: 'Fornecedor B',
+                products: [
+                    { code: 'PROD-456', description: 'Tinta Branca 1L', quantity: 20, price: 24.50 },
+                    { code: 'PROD-789', description: 'Martelo', quantity: 10, price: 40.00 },
+                    { code: 'PROD-101', description: 'Cabo de Vassoura', quantity: 25, price: 1.50 }
+                ]
+            },
+            'NF-999': {
+                supplier: 'Novo Fornecedor LTDA',
+                products: [
+                    { code: 'PROD-NOVO-1', description: 'Cadeira de Escritório', quantity: 5, price: 350.00 },
+                    { code: 'PROD-NOVO-2', description: 'Mesa de Reunião', quantity: 2, price: 800.00 }
+                ]
+            }
+        };
+
+        // Função para mostrar o modal de feedback
         function showFeedbackModal(message, isSuccess = true) {
             feedbackMessage.textContent = message;
             feedbackMessage.style.color = isSuccess ? '#10B981' : '#EF4444';
@@ -335,10 +551,13 @@
         // Função para carregar os dados do Google Sheets
         async function loadData() {
             try {
+                // Mensagens de carregamento
                 allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
                 upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                stockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                clientsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                homeStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                foodStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                clientsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
+                upcomingClientsTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
 
                 console.log('Fetching data from URL:', `${SCRIPT_URL}?type=get_all_data`);
 
@@ -358,12 +577,21 @@
                 // Extrai as cidades únicas para os filtros
                 cities = [...new Set(clients.map(client => client.Cidade))].sort();
 
+                // Calcula o saldo total de cada cliente
+                clients.forEach(client => {
+                    const clientSales = sales.filter(sale => sale.Cliente === client.Nome);
+                    const totalBalance = clientSales.reduce((sum, sale) => sum + parseFloat(sale['Saldo a Pagar']), 0);
+                    client.balance = totalBalance;
+                });
+
+                // Renderiza as tabelas com os dados carregados
                 renderSales();
-                renderUpcomingDues(); // Chama a nova função de renderização
+                renderUpcomingDues();
                 renderStock();
-                renderClients(); // Chama a nova função de renderização de clientes
+                renderClients();
                 populateClientFilter();
-                populateCityFilters(); // Atualizado para popular os dois filtros de cidade
+                populateCityFilters();
+                populateRemoveProductSelect();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 console.error('Detalhes do erro de fetch:', error.message, error);
@@ -389,40 +617,94 @@
             clientCityFilterSelect.innerHTML = cityOptions;
         }
 
-        // Função para renderizar a tabela de clientes (NOVO)
+        // Função para popular o select de remoção de produtos
+        function populateRemoveProductSelect() {
+            removeProductSelect.innerHTML = '<option value="">Selecione um produto</option>';
+            products.forEach(product => {
+                const option = document.createElement('option');
+                // Adiciona a descrição e a quantidade em estoque para ajudar o usuário
+                option.textContent = `${product.Descrição} (${product.Estoque} em estoque)`;
+                option.value = product.Código;
+                removeProductSelect.appendChild(option);
+            });
+        }
+
+        // Funções de renderização
         function renderClients() {
             const selectedCity = clientCityFilterSelect.value;
-
+            const balanceFilter = clientBalanceFilterSelect.value;
             let filteredClients = clients;
+
             if (selectedCity) {
                 filteredClients = clients.filter(client => client.Cidade === selectedCity);
+            }
+            if (balanceFilter === 'due') {
+                filteredClients = filteredClients.filter(client => client.balance > 0);
+            } else if (balanceFilter === 'paid') {
+                filteredClients = filteredClients.filter(client => client.balance === 0);
             }
             
             clientsTableBody.innerHTML = '';
             if (filteredClients.length === 0) {
-                clientsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>';
-                return;
+                clientsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum cliente encontrado com os filtros selecionados.</td></tr>';
+            } else {
+                filteredClients.forEach(client => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Rua}, ${client.Número} ${client.Complemento ? `(${client.Complemento})` : ''}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Cidade}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${client.balance.toFixed(2).replace('.', ',')}</td>
+                    `;
+                    clientsTableBody.appendChild(row);
+                });
             }
 
-            filteredClients.forEach(client => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-100');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Rua}, ${client.Número} ${client.Complemento ? `(${client.Complemento})` : ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Cidade}</td>
-                `;
-                clientsTableBody.appendChild(row);
+            // Renderiza a nova tabela de clientes com vencimentos próximos
+            const today = new Date();
+            const thirtyDaysLater = new Date();
+            thirtyDaysLater.setDate(today.getDate() + 30);
+            
+            // Encontra clientes com promissórias a vencer nos próximos 30 dias
+            const upcomingDuesClientIds = new Set();
+            sales.forEach(sale => {
+                const dueDate = new Date(sale['Data Vencimento']);
+                const hasBalance = parseFloat(sale['Saldo a Pagar']) > 0;
+                const isUpcoming = dueDate >= today && dueDate <= thirtyDaysLater;
+                if (hasBalance && isUpcoming) {
+                    const client = clients.find(c => c.Nome === sale.Cliente);
+                    if (client) {
+                        upcomingDuesClientIds.add(client.ID);
+                    }
+                }
             });
+
+            const upcomingClients = clients.filter(client => upcomingDuesClientIds.has(client.ID));
+            
+            upcomingClientsTableBody.innerHTML = '';
+            if (upcomingClients.length === 0) {
+                upcomingClientsTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum cliente com vencimentos próximos.</td></tr>';
+            } else {
+                upcomingClients.forEach(client => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${client.balance.toFixed(2).replace('.', ',')}</td>
+                    `;
+                    upcomingClientsTableBody.appendChild(row);
+                });
+            }
         }
         
-        // Funções de renderização
         function renderSales() {
             const selectedClientId = clientFilterSelect.value;
             const selectedCity = cityFilterSelect.value;
-
             let filteredSales = sales;
 
             if (selectedClientId) {
@@ -430,10 +712,9 @@
                 if (selectedClient) {
                     filteredSales = filteredSales.filter(sale => sale.Cliente === selectedClient.Nome);
                 } else {
-                    filteredSales = []; // Nenhum cliente encontrado, retorna uma lista vazia
+                    filteredSales = [];
                 }
             }
-            
             if (selectedCity) {
                 const clientsInCity = clients.filter(c => c.Cidade === selectedCity).map(c => c.Nome);
                 filteredSales = filteredSales.filter(sale => clientsInCity.includes(sale.Cliente));
@@ -444,7 +725,6 @@
                 allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhuma venda encontrada.</td></tr>';
                 return;
             }
-
             filteredSales.forEach(sale => {
                 const row = document.createElement('tr');
                 row.classList.add('hover:bg-gray-100');
@@ -462,13 +742,10 @@
             });
         }
         
-        // Função para renderizar a tabela de próximos vencimentos (NOVO)
         function renderUpcomingDues() {
             const today = new Date();
             const thirtyDaysLater = new Date();
             thirtyDaysLater.setDate(today.getDate() + 30);
-
-            // Filtra as vendas com saldo positivo e vencimento nos próximos 30 dias
             const upcomingDues = sales.filter(sale => {
                 const dueDate = new Date(sale['Data Vencimento']);
                 const hasBalance = parseFloat(sale['Saldo a Pagar']) > 0;
@@ -481,7 +758,6 @@
                 upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum vencimento próximo.</td></tr>';
                 return;
             }
-
             upcomingDues.forEach(sale => {
                 const row = document.createElement('tr');
                 row.classList.add('hover:bg-gray-100');
@@ -496,18 +772,70 @@
         }
 
         function renderStock() {
-            stockTableBody.innerHTML = '';
-            products.forEach(product => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-100');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
-                `;
-                stockTableBody.appendChild(row);
-            });
+            // Filtra os produtos por categoria
+            const homeProducts = products.filter(p => p.Categoria === 'Para Casa');
+            const foodProducts = products.filter(p => p.Categoria === 'Alimentício');
+            
+            // Renderiza a tabela de produtos para casa
+            homeStockTableBody.innerHTML = '';
+            if (homeProducts.length === 0) {
+                homeStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto para casa encontrado.</td></tr>';
+            } else {
+                homeProducts.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
+                    `;
+                    homeStockTableBody.appendChild(row);
+                });
+            }
+
+            // Renderiza a tabela de produtos alimentícios
+            foodStockTableBody.innerHTML = '';
+            if (foodProducts.length === 0) {
+                foodStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto alimentício encontrado.</td></tr>';
+            } else {
+                foodProducts.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-100');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
+                    `;
+                    foodStockTableBody.appendChild(row);
+                });
+            }
+        }
+        
+        // Função para adicionar/atualizar um produto no estoque (localmente)
+        async function addSingleProduct(productData) {
+            // Verifica se o produto já existe no array local de produtos
+            const existingProductIndex = products.findIndex(p => p.Código === productData.code);
+
+            if (existingProductIndex !== -1) {
+                // Se o produto já existe, atualiza o estoque
+                products[existingProductIndex].Estoque = parseInt(products[existingProductIndex].Estoque) + parseInt(productData.quantity);
+                showFeedbackModal(`Estoque do produto ${products[existingProductIndex].Descrição} atualizado!`);
+            } else {
+                // Se não existe, cria um novo produto
+                const newProduct = {
+                    Código: productData.code,
+                    Descrição: productData.description,
+                    Estoque: productData.quantity,
+                    Preço: productData.price,
+                    // Por padrão, produtos da NF simulada são de "Para Casa"
+                    Categoria: 'Para Casa' 
+                };
+                products.push(newProduct);
+                showFeedbackModal(`Produto ${productData.description} adicionado ao estoque!`);
+            }
+            renderStock();
         }
 
         // Funções de evento
@@ -529,9 +857,6 @@
                 }
             };
 
-            // A geração do ID é responsabilidade do Apps Script (backend)
-            console.log("Enviando dados do novo cliente para o servidor...");
-
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -545,6 +870,88 @@
                     loadData();
                 } else {
                     showFeedbackModal('Erro ao cadastrar cliente: ' + result.message, false);
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
+            }
+        });
+
+        // Event listener para o novo formulário de produtos
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const productData = {
+                type: 'add_product',
+                data: {
+                    code: formData.get('productCode') || '', // Código agora é opcional
+                    description: formData.get('productDescription'),
+                    stock: parseInt(formData.get('productStock')),
+                    price: parseFloat(formData.get('productPrice')),
+                    category: formData.get('productCategory')
+                }
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(productData),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showFeedbackModal('Produto adicionado com sucesso! Recarregando dados...');
+                    e.target.reset();
+                    loadData();
+                } else {
+                    showFeedbackModal('Erro ao adicionar produto: ' + result.message, false);
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
+            }
+        });
+
+        // Event listener para o formulário de remoção de produtos
+        removeProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const productCode = formData.get('productCode');
+            const quantity = parseInt(formData.get('quantity'));
+
+            if (!productCode || isNaN(quantity) || quantity <= 0) {
+                showFeedbackModal('Por favor, selecione um produto e digite uma quantidade válida.', false);
+                return;
+            }
+
+            // Verifica se a quantidade em estoque é suficiente
+            const productInStock = products.find(p => p.Código === productCode);
+            if (!productInStock || productInStock.Estoque < quantity) {
+                showFeedbackModal('Não há estoque suficiente para esta quantidade.', false);
+                return;
+            }
+
+            const removalData = {
+                type: 'remove_stock',
+                data: {
+                    code: productCode,
+                    quantity: quantity
+                }
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(removalData),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showFeedbackModal('Saída de estoque registrada com sucesso! Recarregando dados...');
+                    e.target.reset();
+                    loadData();
+                } else {
+                    showFeedbackModal('Erro ao registrar a saída de estoque: ' + result.message, false);
                 }
             } catch (error) {
                 console.error('Erro de conexão:', error);
@@ -587,11 +994,115 @@
             }
         });
 
+        // Event listener para o novo formulário de busca de nota fiscal
+        invoiceSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const invoiceNumber = document.getElementById('invoiceNumber').value.toUpperCase().trim();
+            const invoiceData = dummyInvoices[invoiceNumber];
+
+            if (invoiceData) {
+                renderInvoiceDetails(invoiceNumber, invoiceData);
+                showFeedbackModal('Nota Fiscal encontrada!');
+            } else {
+                invoiceDetailsDiv.innerHTML = `
+                    <div class="text-center text-gray-500 p-4">
+                        <span class="text-4xl">😔</span>
+                        <p class="mt-2">Nota fiscal não encontrada. Tente "NF-001", "NF-002" ou "NF-999".</p>
+                    </div>`;
+                showFeedbackModal('Nota Fiscal não encontrada.', false);
+            }
+        });
+
+        // Função para renderizar os detalhes da nota fiscal simulada
+        function renderInvoiceDetails(invoiceNumber, data) {
+            invoiceDetailsDiv.innerHTML = `
+                <div class="mb-6">
+                    <p class="text-lg font-semibold">Fornecedor: <span class="text-gray-600">${data.supplier}</span></p>
+                    <p class="text-lg font-semibold">Nota Fiscal: <span class="text-gray-600">${invoiceNumber}</span></p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço Unitário</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceProductsTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            const invoiceProductsTableBody = document.getElementById('invoiceProductsTableBody');
+            data.products.forEach(product => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.code}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.quantity}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="add-to-stock-btn btn btn-primary text-xs" data-product='${JSON.stringify(product)}'>Adicionar ao Estoque</button>
+                    </td>
+                `;
+                invoiceProductsTableBody.appendChild(row);
+            });
+            // Adiciona event listener para os botões recém-criados
+            document.querySelectorAll('.add-to-stock-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const product = JSON.parse(e.target.dataset.product);
+                    addSingleProduct(product);
+                });
+            });
+        }
+
+
         // Eventos para atualização da tela
         clientFilterSelect.addEventListener('change', renderSales);
         cityFilterSelect.addEventListener('change', renderSales);
-        clientCityFilterSelect.addEventListener('change', renderClients); // Novo evento para a tabela de clientes
+        clientCityFilterSelect.addEventListener('change', renderClients);
+        clientBalanceFilterSelect.addEventListener('change', renderClients); // Novo evento para o filtro de saldo
 
+        // Função para alternar entre o menu e as seções de conteúdo
+        function showSection(targetSectionId) {
+            mainMenu.classList.add('hidden');
+            contentSectionsContainer.classList.remove('hidden');
+            
+            allContentSections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            const targetSection = document.getElementById(targetSectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+        }
+
+        // Event listeners para os botões do menu
+        actionButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.currentTarget.dataset.target;
+                showSection(target);
+            });
+        });
+
+        // Event listener para o botão de voltar ao menu
+        backToMenuBtn.addEventListener('click', () => {
+            mainMenu.classList.remove('hidden');
+            contentSectionsContainer.classList.add('hidden');
+            // Reseta o estado da seção de nota fiscal
+            document.getElementById('invoiceNumber').value = '';
+            invoiceDetailsDiv.innerHTML = `
+                <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
+                    <span class="text-4xl">🧾</span>
+                    <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
+                </div>`;
+        });
+        
         // Dispara a carga de dados ao carregar a página
         loadData();
 
