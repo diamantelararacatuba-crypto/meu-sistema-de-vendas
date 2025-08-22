@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão Financeira e Estoque</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluindo a biblioteca IMask para formatação de inputs -->
     <script src="https://unpkg.com/imask"></script>
     <style>
         /* Estilos CSS gerais */
@@ -29,1049 +30,474 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             padding: 2rem;
         }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            font-weight: 500;
-            transition: background-color 0.2s;
+        .hidden {
+            display: none !important;
         }
         .btn-primary {
             background-color: #4f46e5;
-            color: #ffffff;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
         }
         .btn-primary:hover {
             background-color: #4338ca;
         }
         .btn-secondary {
             background-color: #e5e7eb;
-            color: #1f2937;
+            color: #374151;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
         }
         .btn-secondary:hover {
             background-color: #d1d5db;
         }
-        input, select, textarea {
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            border: 1px solid #d1d5db;
-            padding: 0.5rem 0.75rem;
-            width: 100%;
-            transition: border-color 0.2s;
+            font-weight: 500;
+            transition: background-color 0.3s;
         }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        .btn-danger:hover {
+            background-color: #dc2626;
         }
-        
-        /* Estilos para o modal de feedback */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        .action-button {
+        .back-btn-box {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            background-color: #f9fafb;
-            border-radius: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .action-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        .back-btn-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body class="p-8">
+<body class="bg-gray-100">
 
-    <div class="container">
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Título principal (sem a descrição do dashboard) -->
         <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800">Sistema de Gestão</h1>
-            <p class="mt-4 text-xl text-gray-600">
-                Escolha uma ação para começar.
-            </p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-indigo-900 mb-2">Sistema de Gestão Financeira</h1>
         </header>
 
-        <!-- Seção de Botões Principais -->
-        <section id="main-menu" class="card mb-12">
-            <h2 class="text-2xl font-bold mb-6 text-center">Menu Principal</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <button class="action-button" data-target="section-add-client">
-                    <span class="text-4xl">👨‍💻</span>
-                    <span class="mt-2 text-lg font-semibold">Cadastrar Cliente</span>
+        <!-- Container principal do conteúdo -->
+        <main class="flex justify-center">
+            <!-- Menu Principal - inicialmente visível -->
+            <div id="main-menu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
+                <!-- Botão para Cadastrar Clientes -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="cadastrar-cliente-section">
+                    <span class="text-5xl mb-4">👨‍👩‍👧‍👦</span>
+                    <h2 class="text-2xl font-bold mb-2">Cadastrar Cliente</h2>
+                    <p class="text-gray-500">Adicionar novos clientes</p>
                 </button>
-                <button class="action-button" data-target="section-client-list">
-                    <span class="text-4xl">👥</span>
-                    <span class="mt-2 text-lg font-semibold">Ver Clientes</span>
+                <!-- Botão para Ver Clientes -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="ver-clientes-section">
+                    <span class="text-5xl mb-4">👥</span>
+                    <h2 class="text-2xl font-bold mb-2">Ver Clientes</h2>
+                    <p class="text-gray-500">Visualizar e gerenciar clientes</p>
                 </button>
-                <button class="action-button" data-target="section-sales">
-                    <span class="text-4xl">📈</span>
-                    <span class="mt-2 text-lg font-semibold">Vendas e Promissórias</span>
+                <!-- Botão para Vendas e Promissórias -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="vendas-section">
+                    <span class="text-5xl mb-4">📝</span>
+                    <h2 class="text-2xl font-bold mb-2">Vendas e Promissórias</h2>
+                    <p class="text-gray-500">Lançar vendas e promissórias</p>
                 </button>
-                <button class="action-button" data-target="section-upcoming-dues">
-                    <span class="text-4xl">📅</span>
-                    <span class="mt-2 text-lg font-semibold">Próximos Vencimentos</span>
+                <!-- Botão para Próximos Vencimentos -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="proximos-vencimentos-section">
+                    <span class="text-5xl mb-4">📅</span>
+                    <h2 class="text-2xl font-bold mb-2">Próximos Vencimentos</h2>
+                    <p class="text-gray-500">Visualizar pagamentos próximos</p>
                 </button>
-                <button class="action-button" data-target="section-stock">
-                    <span class="text-4xl">📦</span>
-                    <span class="mt-2 text-lg font-semibold">Controle de Estoque</span>
+                <!-- Botão para Controle de Estoque -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="estoque-section">
+                    <span class="text-5xl mb-4">📦</span>
+                    <h2 class="text-2xl font-bold mb-2">Controle de Estoque</h2>
+                    <p class="text-gray-500">Gerenciar produtos e dar baixa</p>
                 </button>
-                <button class="action-button" data-target="section-payment">
-                    <span class="text-4xl">💰</span>
-                    <span class="mt-2 text-lg font-semibold">Registrar Pagamento</span>
+                <!-- Botão para Registrar Pagamento -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="registrar-pagamento-section">
+                    <span class="text-5xl mb-4">💰</span>
+                    <h2 class="text-2xl font-bold mb-2">Registrar Pagamento</h2>
+                    <p class="text-gray-500">Adicionar pagamentos de promissórias</p>
                 </button>
-                <button class="action-button" data-target="section-invoice-entry">
-                    <span class="text-4xl">📄</span>
-                    <span class="mt-2 text-lg font-semibold">Entrada de Nota Fiscal</span>
+                <!-- Botão para Entrada de Nota Fiscal -->
+                <button class="action-btn card flex flex-col items-center justify-center text-center p-6 transition-transform transform hover:scale-105" data-target="nota-fiscal-section">
+                    <span class="text-5xl mb-4">🧾</span>
+                    <h2 class="text-2xl font-bold mb-2">Entrada de Nota Fiscal</h2>
+                    <p class="text-gray-500">Registrar entrada de produtos por nota</p>
                 </button>
             </div>
-        </section>
 
-        <!-- Seções de Conteúdo (Inicialmente ocultas) -->
-        <div id="content-sections" class="hidden">
-            <!-- Botão de Voltar ao Menu -->
-            <button id="backToMenuBtn" class="btn btn-secondary mb-8">← Voltar ao Menu</button>
+            <!-- Container para as seções de conteúdo - inicialmente oculto -->
+            <div id="content-sections-container" class="hidden w-full max-w-4xl">
+                <!-- Botão para voltar ao menu com novo estilo de "caixinha" -->
+                <div class="mb-6 flex justify-between items-center">
+                    <button id="back-to-menu-btn" class="back-btn-box btn-secondary flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Voltar ao Menu Anterior
+                    </button>
+                    <h2 id="section-title" class="text-3xl font-bold text-gray-800"></h2>
+                </div>
 
-            <!-- Seção: Cadastrar Cliente -->
-            <section id="section-add-client" class="card mb-12 hidden">
-                <h2 class="text-2xl font-bold mb-6">Cadastro de Clientes</h2>
-                <p class="text-sm text-gray-500 mb-4">Adicione novos clientes que ainda não estão no sistema com todos os dados.</p>
-                <form id="addClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                        <input type="text" id="clientName" name="clientName" required class="w-full">
-                    </div>
-                    <div>
-                        <label for="clientRG" class="block text-sm font-medium text-gray-700 mb-1">RG</label>
-                        <input type="text" id="clientRG" name="clientRG" required class="w-full" placeholder="00.000.000-0">
-                    </div>
-                    <div>
-                        <label for="clientCPF" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
-                        <input type="text" id="clientCPF" name="clientCPF" required class="w-full" placeholder="000.000.000-00">
-                    </div>
-                    <div>
-                        <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                        <input type="text" id="clientPhone" name="clientPhone" required class="w-full" placeholder="(DD) 99999-9999">
-                    </div>
-                    <!-- Nova linha para Rua, Número e Complemento -->
-                    <div class="sm:col-span-2">
-                        <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
-                        <input type="text" id="clientStreet" name="clientStreet" required class="w-full">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+                <!-- Seção: Cadastrar Clientes -->
+                <div id="cadastrar-cliente-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Cadastrar Cliente</h3>
+                    <form id="cadastrar-cliente-form" class="space-y-4">
                         <div>
-                            <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                            <input type="text" id="clientNumber" name="clientNumber" required class="w-full">
+                            <label for="cliente-id" class="block text-gray-700 font-semibold mb-1">ID do Cliente</label>
+                            <input type="text" id="cliente-id" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed" disabled>
                         </div>
                         <div>
-                            <label for="clientComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-                            <input type="text" id="clientComplement" name="clientComplement" class="w-full">
+                            <label for="nome-cliente" class="block text-gray-700 font-semibold mb-1">Nome Completo</label>
+                            <input type="text" id="nome-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
+                        <div>
+                            <label for="telefone-cliente" class="block text-gray-700 font-semibold mb-1">Telefone</label>
+                            <input type="text" id="telefone-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="rg-cliente" class="block text-gray-700 font-semibold mb-1">RG</label>
+                                <input type="text" id="rg-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="cpf-cliente" class="block text-gray-700 font-semibold mb-1">CPF</label>
+                                <input type="text" id="cpf-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="rua-cliente" class="block text-gray-700 font-semibold mb-1">Rua</label>
+                            <input type="text" id="rua-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="numero-cliente" class="block text-gray-700 font-semibold mb-1">Número</label>
+                                <input type="text" id="numero-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="complemento-cliente" class="block text-gray-700 font-semibold mb-1">Complemento</label>
+                                <input type="text" id="complemento-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="bairro-cliente" class="block text-gray-700 font-semibold mb-1">Bairro</label>
+                                <input type="text" id="bairro-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="cidade-cliente" class="block text-gray-700 font-semibold mb-1">Cidade</label>
+                            <input type="text" id="cidade-cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Cadastrar Cliente</button>
+                    </form>
+                </div>
+                
+                <!-- Seção: Ver Clientes -->
+                <div id="ver-clientes-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Ver Clientes</h3>
+                    <div class="mb-4">
+                        <label for="filtro-cidade" class="block text-gray-700 font-semibold mb-1">Filtrar por Cidade</label>
+                        <input type="text" id="filtro-cidade" placeholder="Digite a cidade..." class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
-                    <div>
-                        <label for="clientNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-                        <input type="text" id="clientNeighborhood" name="clientNeighborhood" required class="w-full">
-                    </div>
-                    <div>
-                        <label for="clientCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                        <input type="text" id="clientCity" name="clientCity" required class="w-full">
-                    </div>
-                    <div class="flex items-end sm:col-span-2">
-                        <button type="submit" class="btn btn-primary w-full">Cadastrar Cliente</button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Seção: Carteira de Clientes -->
-            <section id="section-client-list" class="card mb-12 hidden">
-                <h2 class="text-2xl font-bold mb-6">Carteira de Clientes</h2>
-                <!-- Nova seção de filtro para clientes com saldo -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="clientCityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
-                        <select id="clientCityFilterSelect" class="w-full">
-                            <option value="">Todas as Cidades</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="clientBalanceFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Saldo</label>
-                        <select id="clientBalanceFilterSelect" class="w-full">
-                            <option value="all">Todos os Clientes</option>
-                            <option value="due">Clientes com Saldo a Pagar</option>
-                            <option value="paid">Clientes com Saldo Pago</option>
-                        </select>
+                    <div id="ver-clientes-table-container" class="overflow-x-auto">
+                        <!-- Tabela de clientes será renderizada aqui via JS -->
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endereço</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientsTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
 
-                <!-- Nova Tabela: Clientes com Vencimentos Próximos -->
-                <h3 class="text-xl font-bold mt-8 mb-4">Clientes com Vencimentos Próximos</h3>
-                <p class="text-sm text-gray-500 mb-4">Clientes que possuem uma ou mais promissórias com vencimento nos próximos 30 dias.</p>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total a Pagar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="upcomingClientsTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
+                <!-- Seção: Vendas e Promissórias -->
+                <div id="vendas-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Vendas e Promissórias</h3>
+                    <form id="venda-promissoria-form" class="space-y-4">
+                        <div>
+                            <label for="cliente-id-venda" class="block text-gray-700 font-semibold mb-1">ID do Cliente</label>
+                            <input type="text" id="cliente-id-venda" placeholder="Digite o ID do cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <span id="cliente-nome-venda" class="block mt-1 text-sm text-gray-500"></span>
+                        </div>
+                        <div>
+                            <label for="data-venda" class="block text-gray-700 font-semibold mb-1">Data da Venda</label>
+                            <input type="date" id="data-venda" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="data-vencimento" class="block text-gray-700 font-semibold mb-1">Data de Vencimento</label>
+                            <input type="date" id="data-vencimento" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="valor-total-venda" class="block text-gray-700 font-semibold mb-1">Valor Total</label>
+                            <input type="number" id="valor-total-venda" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="valor-pago-venda" class="block text-gray-700 font-semibold mb-1">Valor Pago (Entrada)</label>
+                            <input type="number" id="valor-pago-venda" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Adicionar Venda</button>
+                    </form>
                 </div>
-            </section>
-
-            <!-- Seção: Vendas e Promissórias -->
-            <section id="section-sales" class="card mb-12 hidden">
-                <h2 class="text-2xl font-bold mb-6">Consultar Vendas e Promissórias</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="clientFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cliente</label>
-                        <select id="clientFilterSelect" class="w-full">
-                            <option value="">Todos os Clientes</option>
-                        </select>
+                
+                <!-- Seção: Próximos Vencimentos -->
+                <div id="proximos-vencimentos-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Próximos Vencimentos</h3>
+                    <div id="proximos-vencimentos-container" class="space-y-4">
+                        <!-- Itens de vencimento próximos serão renderizados aqui via JS -->
                     </div>
-                    <div>
-                        <label for="cityFilterSelect" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cidade</label>
-                        <select id="cityFilterSelect" class="w-full">
-                            <option value="">Todas as Cidades</option>
-                        </select>
+                </div>
+
+                <!-- Seção: Controle de Estoque -->
+                <div id="estoque-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Controle de Estoque</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-bold">Produtos em Estoque</h4>
+                        <button id="add-product-btn" class="btn-primary py-2 px-4 text-sm">Adicionar Produto</button>
+                    </div>
+                    
+                    <!-- Formulário de adicionar produto (inicialmente oculto) -->
+                    <form id="add-product-form" class="hidden space-y-4 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xl font-bold">Novo Produto</h4>
+                            <button type="button" id="cancel-add-product" class="text-gray-500 hover:text-gray-700">&times;</button>
+                        </div>
+                        <div>
+                            <label for="product-id" class="block text-gray-700 font-semibold mb-1">Código do Produto (Opcional)</label>
+                            <input type="text" id="product-id" placeholder="Gerado automaticamente se vazio" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="product-description" class="block text-gray-700 font-semibold mb-1">Descrição</label>
+                            <input type="text" id="product-description" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="product-quantity" class="block text-gray-700 font-semibold mb-1">Quantidade em Estoque</label>
+                            <input type="number" id="product-quantity" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="product-price" class="block text-gray-700 font-semibold mb-1">Preço</label>
+                            <input type="number" id="product-price" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="product-category" class="block text-gray-700 font-semibold mb-1">Categoria</label>
+                            <select id="product-category" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="casa">Produtos de Casa</option>
+                                <option value="alimenticio">Produto Alimentício</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Salvar Produto</button>
+                    </form>
+
+                    <div id="estoque-table-container" class="overflow-x-auto">
+                        <!-- Tabela de estoque será renderizada aqui via JS -->
                     </div>
                 </div>
                 
-                <div id="salesListContainer" class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allSalesTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Seção: Próximos Vencimentos -->
-            <section id="section-upcoming-dues" class="card mb-12 hidden">
-                <h2 class="text-2xl font-bold mb-6">Próximos Vencimentos</h2>
-                <p class="text-sm text-gray-500 mb-4">Promissórias com vencimento nos próximos 30 dias.</p>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº NF/Recibo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo a Pagar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="upcomingDuesTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Seção: Estoque -->
-            <section id="section-stock" class="card mb-12 hidden">
-                <h2 class="text-2xl font-bold mb-6">Controle de Estoque</h2>
-                <!-- Formulário de Cadastro de Produtos -->
-                <h3 class="text-xl font-bold mb-4 mt-6">Cadastro de Produtos</h3>
-                <p class="text-sm text-gray-500 mb-4">
-                    Adicione novos produtos ao estoque. O código é opcional.
-                </p>
-                <form id="addProductForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    <div>
-                        <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                        <select id="productCategory" name="productCategory" required class="w-full">
-                            <option value="Para Casa">Produtos para Casa</option>
-                            <option value="Alimentício">Produtos Alimentícios</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="productCode" class="block text-sm font-medium text-gray-700 mb-1">Código do Produto (Opcional)</label>
-                        <input type="text" id="productCode" name="productCode" class="w-full">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="productDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-                        <input type="text" id="productDescription" name="productDescription" required class="w-full">
-                    </div>
-                    <div>
-                        <label for="productStock" class="block text-sm font-medium text-gray-700 mb-1">Estoque Inicial</label>
-                        <input type="number" id="productStock" name="productStock" min="0" required class="w-full">
-                    </div>
-                    <div>
-                        <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
-                        <input type="number" id="productPrice" name="productPrice" step="0.01" min="0" required class="w-full">
-                    </div>
-                    <div class="sm:col-span-2 flex justify-end">
-                        <button type="submit" class="btn btn-primary w-full">Adicionar Produto</button>
-                    </div>
-                </form>
-
-                <!-- Nova Seção: Saída Manual de Produto -->
-                <h3 class="text-xl font-bold mb-4 mt-6">Saída Manual de Produto</h3>
-                <p class="text-sm text-gray-500 mb-4">
-                    Retire produtos do estoque para a montagem de cestas ou para outros fins.
-                </p>
-                <form id="removeProductForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    <div>
-                        <label for="removeProductSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione o Produto</label>
-                        <select id="removeProductSelect" name="productCode" required class="w-full">
-                            <!-- Opções serão preenchidas via JavaScript -->
-                            <option value="">Selecione um produto</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="removeQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade a Retirar</label>
-                        <input type="number" id="removeQuantity" name="quantity" min="1" required class="w-full">
-                    </div>
-                    <div class="sm:col-span-2 flex justify-end">
-                        <button type="submit" class="btn btn-primary w-full">Retirar do Estoque</button>
-                    </div>
-                </form>
-
-                <!-- Tabelas de Estoque Separadas por Categoria -->
-                <h3 class="text-xl font-bold mb-4 mt-8">Estoque Atual - Produtos para Casa</h3>
-                <div class="overflow-x-auto mb-8">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
-                            </tr>
-                        </thead>
-                        <tbody id="homeStockTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto para casa encontrado.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="text-xl font-bold mb-4 mt-8">Estoque Atual - Produtos Alimentícios</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
-                            </tr>
-                        </thead>
-                        <tbody id="foodStockTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto alimentício encontrado.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Seção: Registrar Pagamento -->
-            <section id="section-payment" class="card hidden">
-                <h2 class="text-2xl font-bold mb-6">Registrar Pagamento de Promissória</h2>
-                <form id="paymentForm">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <!-- Seção: Registrar Pagamento -->
+                <div id="registrar-pagamento-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Registrar Pagamento</h3>
+                    <form id="registrar-pagamento-form" class="space-y-4">
                         <div>
-                            <label for="paymentInvoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº NF/Recibo da Promissória</label>
-                            <input type="text" id="paymentInvoiceNumber" name="invoiceNumber" required class="w-full">
+                            <label for="cliente-id-pagamento" class="block text-gray-700 font-semibold mb-1">ID do Cliente</label>
+                            <input type="text" id="cliente-id-pagamento" placeholder="Digite o ID do cliente" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div id="pagamento-cliente-info" class="p-4 bg-gray-50 rounded-lg hidden">
+                            <!-- Informações do cliente e dívida serão mostradas aqui -->
                         </div>
                         <div>
-                            <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Pago</label>
-                            <input type="number" id="paymentAmount" name="amount" step="0.01" min="0" required class="w-full">
+                            <label for="data-pagamento" class="block text-gray-700 font-semibold mb-1">Data do Pagamento</label>
+                            <input type="date" id="data-pagamento" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        <div class="sm:col-span-2">
-                            <label for="paymentNewDueDate" class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento (Opcional)</label>
-                            <input type="date" id="paymentNewDueDate" name="newDueDate" class="w-full">
+                        <div>
+                            <label for="valor-pago-pagamento" class="block text-gray-700 font-semibold mb-1">Valor Pago</label>
+                            <input type="number" id="valor-pago-pagamento" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
+                        <button type="submit" class="btn-primary w-full">Registrar Pagamento</button>
+                    </form>
+                </div>
+                
+                <!-- Seção: Entrada de Nota Fiscal -->
+                <div id="nota-fiscal-section" class="card hidden">
+                    <h3 class="text-2xl font-bold mb-4">Entrada de Nota Fiscal</h3>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <input type="text" id="invoiceNumber" placeholder="Número da Nota Fiscal" class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="searchInvoiceBtn" class="btn-primary">Buscar</button>
                     </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="btn btn-primary">Registrar Pagamento</button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Nova Seção: Entrada de Nota Fiscal -->
-            <section id="section-invoice-entry" class="card hidden">
-                <h2 class="text-2xl font-bold mb-6">Entrada de Nota Fiscal</h2>
-                <p class="text-sm text-gray-500 mb-4">Digite o número da Nota Fiscal para preencher automaticamente os produtos para entrada no estoque. (Simulação)</p>
-                <form id="invoiceSearchForm" class="flex gap-4 mb-6">
-                    <input type="text" id="invoiceNumber" name="invoiceNumber" placeholder="Nº da Nota Fiscal" required class="flex-1">
-                    <button type="submit" class="btn btn-primary">Buscar Nota</button>
-                </form>
-                <div id="invoiceDetails">
-                    <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
-                        <span class="text-4xl">🧾</span>
-                        <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
+                    <div id="invoiceDetails" class="card p-4">
+                        <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
+                            <span class="text-4xl">🧾</span>
+                            <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
+                        </div>
                     </div>
                 </div>
-            </section>
 
-        </div>
-    </div>
-
-    <!-- Modal de Feedback (sucesso/erro) -->
-    <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-            <p id="feedbackMessage" class="text-lg font-medium mb-4"></p>
-            <button id="closeModalBtn" class="btn btn-primary">Fechar</button>
-        </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Substitua esta URL pela URL do seu Google Apps Script
-        const https:https://script.google.com/macros/s/AKfycbzSnbezZDoznyTRjMJzEV2TJnjLuUAsd5BRN0ghtA936t2L96QgzTHz1f8DM7HK70mM/exec'; 
-
-        // Variáveis globais para armazenar dados
-        let sales = [];
-        let products = [];
-        let clients = [];
-        let cities = [];
-
-        // Elementos do DOM
+        // --- VÁRIAVEIS GLOBAIS ---
         const mainMenu = document.getElementById('main-menu');
-        const contentSectionsContainer = document.getElementById('content-sections');
-        const allContentSections = document.querySelectorAll('#content-sections section');
-        const backToMenuBtn = document.getElementById('backToMenuBtn');
-        const actionButtons = document.querySelectorAll('.action-button');
+        const contentSectionsContainer = document.getElementById('content-sections-container');
+        const actionButtons = document.querySelectorAll('.action-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const allContentSections = document.querySelectorAll('#content-sections-container > div');
+        const sectionTitle = document.getElementById('section-title');
+        let appData;
 
-        const addClientForm = document.getElementById('addClientForm');
-        const addProductForm = document.getElementById('addProductForm');
-        const removeProductForm = document.getElementById('removeProductForm'); // Novo formulário de saída
-        const paymentForm = document.getElementById('paymentForm');
-        const invoiceSearchForm = document.getElementById('invoiceSearchForm');
-        const invoiceDetailsDiv = document.getElementById('invoiceDetails');
+        // --- DADOS SIMULADOS (Armazenados no localStorage) ---
+        // Agora, o aplicativo começa com dados vazios para clientes, produtos e vendas.
+        function getInitialData() {
+            return {
+                clientes: [],
+                produtos: [],
+                vendas: []
+            };
+        }
 
-        const allSalesTableBody = document.getElementById('allSalesTableBody');
-        const upcomingDuesTableBody = document.getElementById('upcomingDuesTableBody');
-        const homeStockTableBody = document.getElementById('homeStockTableBody');
-        const foodStockTableBody = document.getElementById('foodStockTableBody');
-        const clientsTableBody = document.getElementById('clientsTableBody');
-        const upcomingClientsTableBody = document.getElementById('upcomingClientsTableBody'); // Nova tabela
-        const clientFilterSelect = document.getElementById('clientFilterSelect');
-        const cityFilterSelect = document.getElementById('cityFilterSelect');
-        const clientCityFilterSelect = document.getElementById('clientCityFilterSelect');
-        const clientBalanceFilterSelect = document.getElementById('clientBalanceFilterSelect'); // Novo filtro
-        const clientPhoneInput = document.getElementById('clientPhone');
-        const clientRGInput = document.getElementById('clientRG');
-        const clientCPFInput = document.getElementById('clientCPF');
-        const removeProductSelect = document.getElementById('removeProductSelect');
-
-        const feedbackModal = document.getElementById('feedbackModal');
-        const feedbackMessage = document.getElementById('feedbackMessage');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-
-        // Configura as máscaras de entrada usando IMask
-        IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
-        IMask(clientRGInput, { mask: '00.000.000-0' });
-        IMask(clientCPFInput, { mask: '000.000.000-00' });
-
-        // Simulação de banco de dados de notas fiscais
-        const dummyInvoices = {
-            'NF-001': {
-                supplier: 'Fornecedor A',
-                products: [
-                    { code: 'PROD-123', description: 'Parafusos', quantity: 100, price: 0.5 },
-                    { code: 'PROD-456', description: 'Tinta Branca 1L', quantity: 50, price: 25.00 }
-                ]
-            },
-            'NF-002': {
-                supplier: 'Fornecedor B',
-                products: [
-                    { code: 'PROD-456', description: 'Tinta Branca 1L', quantity: 20, price: 24.50 },
-                    { code: 'PROD-789', description: 'Martelo', quantity: 10, price: 40.00 },
-                    { code: 'PROD-101', description: 'Cabo de Vassoura', quantity: 25, price: 1.50 }
-                ]
-            },
-            'NF-999': {
-                supplier: 'Novo Fornecedor LTDA',
-                products: [
-                    { code: 'PROD-NOVO-1', description: 'Cadeira de Escritório', quantity: 5, price: 350.00 },
-                    { code: 'PROD-NOVO-2', description: 'Mesa de Reunião', quantity: 2, price: 800.00 }
-                ]
+        // Função principal para carregar os dados
+        function loadData() {
+            let data = JSON.parse(localStorage.getItem('financeApp'));
+            if (!data) {
+                data = getInitialData();
+                localStorage.setItem('financeApp', JSON.stringify(data));
             }
-        };
-
-        // Função para mostrar o modal de feedback
-        function showFeedbackModal(message, isSuccess = true) {
-            feedbackMessage.textContent = message;
-            feedbackMessage.style.color = isSuccess ? '#10B981' : '#EF4444';
-            feedbackModal.style.display = 'flex';
+            appData = data;
         }
 
-        // Função para fechar o modal
-        closeModalBtn.addEventListener('click', () => {
-            feedbackModal.style.display = 'none';
-        });
-
-        // Função para carregar os dados do Google Sheets
-        async function loadData() {
-            try {
-                // Mensagens de carregamento
-                allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                homeStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                foodStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                clientsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-                upcomingClientsTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Carregando dados...</td></tr>';
-
-                console.log('Fetching data from URL:', `${SCRIPT_URL}?type=get_all_data`);
-
-                const response = await fetch(`${SCRIPT_URL}?type=get_all_data`);
-                
-                if (!response.ok) {
-                    console.error('Network response was not ok:', response.status, response.statusText);
-                    throw new Error(`Erro do servidor: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                sales = data.sales || [];
-                products = data.products || [];
-                clients = data.clients || [];
-                
-                // Extrai as cidades únicas para os filtros
-                cities = [...new Set(clients.map(client => client.Cidade))].sort();
-
-                // Calcula o saldo total de cada cliente
-                clients.forEach(client => {
-                    const clientSales = sales.filter(sale => sale.Cliente === client.Nome);
-                    const totalBalance = clientSales.reduce((sum, sale) => sum + parseFloat(sale['Saldo a Pagar']), 0);
-                    client.balance = totalBalance;
-                });
-
-                // Renderiza as tabelas com os dados carregados
-                renderSales();
-                renderUpcomingDues();
-                renderStock();
-                renderClients();
-                populateClientFilter();
-                populateCityFilters();
-                populateRemoveProductSelect();
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                console.error('Detalhes do erro de fetch:', error.message, error);
-                showFeedbackModal('Erro ao carregar os dados. Por favor, verifique a URL do Apps Script e sua conexão.', false);
-            }
+        // Função para salvar os dados no localStorage
+        function saveData() {
+            localStorage.setItem('financeApp', JSON.stringify(appData));
         }
 
-        // Função para popular o select de filtro de clientes
-        function populateClientFilter() {
-            clientFilterSelect.innerHTML = '<option value="">Todos os Clientes</option>';
-            clients.forEach(client => {
-                const option = document.createElement('option');
-                option.value = client.ID;
-                option.textContent = client.Nome;
-                clientFilterSelect.appendChild(option);
-            });
-        }
-        
-        // Função para popular os selects de filtro de cidades
-        function populateCityFilters() {
-            const cityOptions = '<option value="">Todas as Cidades</option>' + cities.map(city => `<option value="${city}">${city}</option>`).join('');
-            cityFilterSelect.innerHTML = cityOptions;
-            clientCityFilterSelect.innerHTML = cityOptions;
-        }
-
-        // Função para popular o select de remoção de produtos
-        function populateRemoveProductSelect() {
-            removeProductSelect.innerHTML = '<option value="">Selecione um produto</option>';
-            products.forEach(product => {
-                const option = document.createElement('option');
-                // Adiciona a descrição e a quantidade em estoque para ajudar o usuário
-                option.textContent = `${product.Descrição} (${product.Estoque} em estoque)`;
-                option.value = product.Código;
-                removeProductSelect.appendChild(option);
-            });
-        }
-
-        // Funções de renderização
-        function renderClients() {
-            const selectedCity = clientCityFilterSelect.value;
-            const balanceFilter = clientBalanceFilterSelect.value;
-            let filteredClients = clients;
-
-            if (selectedCity) {
-                filteredClients = clients.filter(client => client.Cidade === selectedCity);
-            }
-            if (balanceFilter === 'due') {
-                filteredClients = filteredClients.filter(client => client.balance > 0);
-            } else if (balanceFilter === 'paid') {
-                filteredClients = filteredClients.filter(client => client.balance === 0);
+        // Renderiza a tabela de clientes
+        function renderClientes(clientesToRender) {
+            const tableContainer = document.getElementById('ver-clientes-table-container');
+            if (!clientesToRender) {
+                clientesToRender = appData.clientes;
             }
             
-            clientsTableBody.innerHTML = '';
-            if (filteredClients.length === 0) {
-                clientsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum cliente encontrado com os filtros selecionados.</td></tr>';
-            } else {
-                filteredClients.forEach(client => {
-                    const row = document.createElement('tr');
-                    row.classList.add('hover:bg-gray-100');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Rua}, ${client.Número} ${client.Complemento ? `(${client.Complemento})` : ''}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Cidade}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${client.balance.toFixed(2).replace('.', ',')}</td>
-                    `;
-                    clientsTableBody.appendChild(row);
-                });
-            }
-
-            // Renderiza a nova tabela de clientes com vencimentos próximos
-            const today = new Date();
-            const thirtyDaysLater = new Date();
-            thirtyDaysLater.setDate(today.getDate() + 30);
-            
-            // Encontra clientes com promissórias a vencer nos próximos 30 dias
-            const upcomingDuesClientIds = new Set();
-            sales.forEach(sale => {
-                const dueDate = new Date(sale['Data Vencimento']);
-                const hasBalance = parseFloat(sale['Saldo a Pagar']) > 0;
-                const isUpcoming = dueDate >= today && dueDate <= thirtyDaysLater;
-                if (hasBalance && isUpcoming) {
-                    const client = clients.find(c => c.Nome === sale.Cliente);
-                    if (client) {
-                        upcomingDuesClientIds.add(client.ID);
-                    }
-                }
-            });
-
-            const upcomingClients = clients.filter(client => upcomingDuesClientIds.has(client.ID));
-            
-            upcomingClientsTableBody.innerHTML = '';
-            if (upcomingClients.length === 0) {
-                upcomingClientsTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum cliente com vencimentos próximos.</td></tr>';
-            } else {
-                upcomingClients.forEach(client => {
-                    const row = document.createElement('tr');
-                    row.classList.add('hover:bg-gray-100');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${client.ID || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Nome}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${client.Telefone}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${client.balance.toFixed(2).replace('.', ',')}</td>
-                    `;
-                    upcomingClientsTableBody.appendChild(row);
-                });
-            }
-        }
-        
-        function renderSales() {
-            const selectedClientId = clientFilterSelect.value;
-            const selectedCity = cityFilterSelect.value;
-            let filteredSales = sales;
-
-            if (selectedClientId) {
-                const selectedClient = clients.find(c => c.ID == selectedClientId);
-                if (selectedClient) {
-                    filteredSales = filteredSales.filter(sale => sale.Cliente === selectedClient.Nome);
-                } else {
-                    filteredSales = [];
-                }
-            }
-            if (selectedCity) {
-                const clientsInCity = clients.filter(c => c.Cidade === selectedCity).map(c => c.Nome);
-                filteredSales = filteredSales.filter(sale => clientsInCity.includes(sale.Cliente));
-            }
-            
-            allSalesTableBody.innerHTML = '';
-            if (filteredSales.length === 0) {
-                allSalesTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhuma venda encontrada.</td></tr>';
+            if (clientesToRender.length === 0) {
+                tableContainer.innerHTML = `<p class="text-center text-gray-500">Nenhum cliente cadastrado.</p>`;
                 return;
             }
-            filteredSales.forEach(sale => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-100');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale['Nº NF/Recibo'] || '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.Cliente}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale['Data Vencimento']}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Valor Total']).toFixed(2).replace('.', ',')}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Saldo a Pagar']).toFixed(2).replace('.', ',')}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <!-- Botões de ação, se necessário -->
-                    </td>
+
+            let html = `
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+            `;
+            clientesToRender.forEach(cliente => {
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${cliente.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${cliente.nome}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${cliente.telefone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${cliente.cidade}</td>
+                    </tr>
                 `;
-                allSalesTableBody.appendChild(row);
             });
+            html += `
+                    </tbody>
+                </table>
+            `;
+            tableContainer.innerHTML = html;
         }
-        
-        function renderUpcomingDues() {
-            const today = new Date();
-            const thirtyDaysLater = new Date();
-            thirtyDaysLater.setDate(today.getDate() + 30);
-            const upcomingDues = sales.filter(sale => {
-                const dueDate = new Date(sale['Data Vencimento']);
-                const hasBalance = parseFloat(sale['Saldo a Pagar']) > 0;
-                const isUpcoming = dueDate >= today && dueDate <= thirtyDaysLater;
-                return hasBalance && isUpcoming;
-            });
+
+        // Renderiza a tabela de produtos em estoque
+        function renderEstoque(produtos) {
+            const tableContainer = document.getElementById('estoque-table-container');
             
-            upcomingDuesTableBody.innerHTML = '';
-            if (upcomingDues.length === 0) {
-                upcomingDuesTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum vencimento próximo.</td></tr>';
+            if (produtos.length === 0) {
+                tableContainer.innerHTML = `<p class="text-center text-gray-500">Nenhum produto no estoque.</p>`;
                 return;
             }
-            upcomingDues.forEach(sale => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-100');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale['Nº NF/Recibo'] || '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.Cliente}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale['Data Vencimento']}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(sale['Saldo a Pagar']).toFixed(2).replace('.', ',')}</td>
+
+            let html = `
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+            `;
+            produtos.forEach(produto => {
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${produto.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${produto.nome}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${produto.quantidade}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">R$ ${produto.preco.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="btn-danger py-1 px-2 text-xs" onclick="darBaixaProduto('${produto.id}')">Dar Saída</button>
+                        </td>
+                    </tr>
                 `;
-                upcomingDuesTableBody.appendChild(row);
             });
+            html += `
+                    </tbody>
+                </table>
+            `;
+            tableContainer.innerHTML = html;
         }
 
-        function renderStock() {
-            // Filtra os produtos por categoria
-            const homeProducts = products.filter(p => p.Categoria === 'Para Casa');
-            const foodProducts = products.filter(p => p.Categoria === 'Alimentício');
-            
-            // Renderiza a tabela de produtos para casa
-            homeStockTableBody.innerHTML = '';
-            if (homeProducts.length === 0) {
-                homeStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto para casa encontrado.</td></tr>';
-            } else {
-                homeProducts.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.classList.add('hover:bg-gray-100');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
-                    `;
-                    homeStockTableBody.appendChild(row);
-                });
-            }
+        // Função de busca de nota fiscal (placeholder)
+        function searchInvoice() {
+            const invoiceNumberInput = document.getElementById('invoiceNumber');
+            const invoiceDetailsDiv = document.getElementById('invoiceDetails');
+            const invoiceNumber = invoiceNumberInput.value.toLowerCase();
 
-            // Renderiza a tabela de produtos alimentícios
-            foodStockTableBody.innerHTML = '';
-            if (foodProducts.length === 0) {
-                foodStockTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum produto alimentício encontrado.</td></tr>';
-            } else {
-                foodProducts.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.classList.add('hover:bg-gray-100');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.Código || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Descrição}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.Estoque}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.Preço).toFixed(2).replace('.', ',')}</td>
-                    `;
-                    foodStockTableBody.appendChild(row);
-                });
-            }
-        }
-        
-        // Função para adicionar/atualizar um produto no estoque (localmente)
-        async function addSingleProduct(productData) {
-            // Verifica se o produto já existe no array local de produtos
-            const existingProductIndex = products.findIndex(p => p.Código === productData.code);
-
-            if (existingProductIndex !== -1) {
-                // Se o produto já existe, atualiza o estoque
-                products[existingProductIndex].Estoque = parseInt(products[existingProductIndex].Estoque) + parseInt(productData.quantity);
-                showFeedbackModal(`Estoque do produto ${products[existingProductIndex].Descrição} atualizado!`);
-            } else {
-                // Se não existe, cria um novo produto
-                const newProduct = {
-                    Código: productData.code,
-                    Descrição: productData.description,
-                    Estoque: productData.quantity,
-                    Preço: productData.price,
-                    // Por padrão, produtos da NF simulada são de "Para Casa"
-                    Categoria: 'Para Casa' 
-                };
-                products.push(newProduct);
-                showFeedbackModal(`Produto ${productData.description} adicionado ao estoque!`);
-            }
-            renderStock();
-        }
-
-        // Funções de evento
-        addClientForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const clientData = {
-                type: 'add_client',
-                data: {
-                    name: formData.get('clientName'),
-                    phone: formData.get('clientPhone'),
-                    rg: formData.get('clientRG'),
-                    cpf: formData.get('clientCPF'),
-                    street: formData.get('clientStreet'),
-                    number: formData.get('clientNumber'),
-                    complement: formData.get('clientComplement'),
-                    neighborhood: formData.get('clientNeighborhood'),
-                    city: formData.get('clientCity')
-                }
+            // Esta é uma simulação da busca. Em uma aplicação real, você faria uma chamada para a API.
+            const fornecedores = {
+                'nf-123': { nome: 'Fornecedor Exemplo', produtos: [{ desc: 'Caneta', qtd: 50 }, { desc: 'Caderno', qtd: 20 }] },
+                'nf-456': { nome: 'Fornecedor B', produtos: [{ desc: 'Lapis', qtd: 100 }, { desc: 'Borracha', qtd: 80 }] }
             };
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(clientData),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Cliente cadastrado com sucesso! Recarregando dados...');
-                    e.target.reset();
-                    loadData();
-                } else {
-                    showFeedbackModal('Erro ao cadastrar cliente: ' + result.message, false);
-                }
-            } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
-            }
-        });
+            const invoice = fornecedores[invoiceNumber];
 
-        // Event listener para o novo formulário de produtos
-        addProductForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const productData = {
-                type: 'add_product',
-                data: {
-                    code: formData.get('productCode') || '', // Código agora é opcional
-                    description: formData.get('productDescription'),
-                    stock: parseInt(formData.get('productStock')),
-                    price: parseFloat(formData.get('productPrice')),
-                    category: formData.get('productCategory')
-                }
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(productData),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Produto adicionado com sucesso! Recarregando dados...');
-                    e.target.reset();
-                    loadData();
-                } else {
-                    showFeedbackModal('Erro ao adicionar produto: ' + result.message, false);
-                }
-            } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
-            }
-        });
-
-        // Event listener para o formulário de remoção de produtos
-        removeProductForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const productCode = formData.get('productCode');
-            const quantity = parseInt(formData.get('quantity'));
-
-            if (!productCode || isNaN(quantity) || quantity <= 0) {
-                showFeedbackModal('Por favor, selecione um produto e digite uma quantidade válida.', false);
-                return;
-            }
-
-            // Verifica se a quantidade em estoque é suficiente
-            const productInStock = products.find(p => p.Código === productCode);
-            if (!productInStock || productInStock.Estoque < quantity) {
-                showFeedbackModal('Não há estoque suficiente para esta quantidade.', false);
-                return;
-            }
-
-            const removalData = {
-                type: 'remove_stock',
-                data: {
-                    code: productCode,
-                    quantity: quantity
-                }
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(removalData),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Saída de estoque registrada com sucesso! Recarregando dados...');
-                    e.target.reset();
-                    loadData();
-                } else {
-                    showFeedbackModal('Erro ao registrar a saída de estoque: ' + result.message, false);
-                }
-            } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
-            }
-        });
-
-        paymentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const paymentData = {
-                type: 'add_payment',
-                invoiceNumber: formData.get('invoiceNumber'),
-                amount: parseFloat(formData.get('amount')),
-                newDueDate: formData.get('newDueDate') || null
-            };
-
-            if (paymentData.amount <= 0 || !paymentData.invoiceNumber) {
-                showFeedbackModal('Por favor, preencha o número da promissória e o valor.', false);
-                return;
-            }
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(paymentData),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Pagamento registrado com sucesso! Recarregando dados...');
-                    e.target.reset();
-                    loadData();
-                } else {
-                    showFeedbackModal('Erro ao registrar pagamento: ' + result.message, false);
-                }
-            } catch (error) {
-                console.error('Erro de conexão:', error);
-                showFeedbackModal('Erro de conexão. Verifique sua internet.', false);
-            }
-        });
-
-        // Event listener para o novo formulário de busca de nota fiscal
-        invoiceSearchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const invoiceNumber = document.getElementById('invoiceNumber').value.toUpperCase().trim();
-            const invoiceData = dummyInvoices[invoiceNumber];
-
-            if (invoiceData) {
-                renderInvoiceDetails(invoiceNumber, invoiceData);
-                showFeedbackModal('Nota Fiscal encontrada!');
+            if (invoice) {
+                invoiceDetailsDiv.innerHTML = `
+                    <div class="p-6">
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">Detalhes da Nota Fiscal: ${invoiceNumber.toUpperCase()}</h4>
+                        <p><strong>Fornecedor:</strong> ${invoice.nome}</p>
+                        <h5 class="text-lg font-semibold mt-4">Produtos:</h5>
+                        <ul class="list-disc list-inside mt-2">
+                            ${invoice.produtos.map(item => `<li>${item.qtd}x ${item.desc}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
             } else {
                 invoiceDetailsDiv.innerHTML = `
                     <div class="text-center text-gray-500 p-4">
-                        <span class="text-4xl">😔</span>
-                        <p class="mt-2">Nota fiscal não encontrada. Tente "NF-001", "NF-002" ou "NF-999".</p>
-                    </div>`;
-                showFeedbackModal('Nota Fiscal não encontrada.', false);
-            }
-        });
-
-        // Função para renderizar os detalhes da nota fiscal simulada
-        function renderInvoiceDetails(invoiceNumber, data) {
-            invoiceDetailsDiv.innerHTML = `
-                <div class="mb-6">
-                    <p class="text-lg font-semibold">Fornecedor: <span class="text-gray-600">${data.supplier}</span></p>
-                    <p class="text-lg font-semibold">Nota Fiscal: <span class="text-gray-600">${invoiceNumber}</span></p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço Unitário</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoiceProductsTableBody" class="bg-white divide-y divide-gray-200">
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            const invoiceProductsTableBody = document.getElementById('invoiceProductsTableBody');
-            data.products.forEach(product => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-100');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.code}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.description}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.quantity}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button class="add-to-stock-btn btn btn-primary text-xs" data-product='${JSON.stringify(product)}'>Adicionar ao Estoque</button>
-                    </td>
+                        <span class="text-4xl">❌</span>
+                        <p class="mt-2">Nota fiscal não encontrada.</p>
+                    </div>
                 `;
-                invoiceProductsTableBody.appendChild(row);
-            });
-            // Adiciona event listener para os botões recém-criados
-            document.querySelectorAll('.add-to-stock-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const product = JSON.parse(e.target.dataset.product);
-                    addSingleProduct(product);
-                });
-            });
+            }
         }
-
-
-        // Eventos para atualização da tela
-        clientFilterSelect.addEventListener('change', renderSales);
-        cityFilterSelect.addEventListener('change', renderSales);
-        clientCityFilterSelect.addEventListener('change', renderClients);
-        clientBalanceFilterSelect.addEventListener('change', renderClients); // Novo evento para o filtro de saldo
-
-        // Função para alternar entre o menu e as seções de conteúdo
+        
+        // Função para mostrar ou ocultar seções
         function showSection(targetSectionId) {
             mainMenu.classList.add('hidden');
             contentSectionsContainer.classList.remove('hidden');
-            
+
             allContentSections.forEach(section => {
                 section.classList.add('hidden');
             });
@@ -1079,35 +505,286 @@
             const targetSection = document.getElementById(targetSectionId);
             if (targetSection) {
                 targetSection.classList.remove('hidden');
+                const buttonTitle = document.querySelector(`[data-target="${targetSectionId}"] h2`).textContent;
+                sectionTitle.textContent = buttonTitle;
+
+                if (targetSectionId === 'ver-clientes-section') {
+                    renderClientes();
+                } else if (targetSectionId === 'estoque-section') {
+                    renderEstoque(appData.produtos);
+                }
             }
         }
 
-        // Event listeners para os botões do menu
+        // Função para dar baixa em um produto
+        function darBaixaProduto(produtoId) {
+            const produto = appData.produtos.find(p => p.id === produtoId);
+            if (!produto) {
+                console.error("Produto não encontrado.");
+                return;
+            }
+
+            const quantidade = prompt(`Quantas unidades de "${produto.nome}" você quer retirar do estoque?`);
+            const quantidadeNumerica = parseInt(quantidade, 10);
+
+            if (quantidadeNumerica > 0 && quantidadeNumerica <= produto.quantidade) {
+                produto.quantidade -= quantidadeNumerica;
+                saveData();
+                renderEstoque(appData.produtos);
+                alert(`${quantidadeNumerica} unidades de "${produto.nome}" foram retiradas do estoque.`);
+            } else if (quantidade !== null) {
+                alert("Quantidade inválida ou insuficiente.");
+            }
+        }
+
+        // Função para cadastrar novo cliente
+        function cadastrarCliente(event) {
+            event.preventDefault();
+            const form = event.target;
+            const nome = form['nome-cliente'].value;
+            const telefone = form['telefone-cliente'].value;
+            const rg = form['rg-cliente'].value;
+            const cpf = form['cpf-cliente'].value;
+            const rua = form['rua-cliente'].value;
+            const numero = form['numero-cliente'].value;
+            const complemento = form['complemento-cliente'].value;
+            const bairro = form['bairro-cliente'].value;
+            const cidade = form['cidade-cliente'].value;
+
+            const newId = appData.clientes.length > 0 ? Math.max(...appData.clientes.map(c => c.id)) + 1 : 1;
+
+            const novoCliente = {
+                id: newId,
+                nome,
+                telefone,
+                rg,
+                cpf,
+                rua,
+                numero,
+                complemento,
+                bairro,
+                cidade
+            };
+
+            appData.clientes.push(novoCliente);
+            saveData();
+            alert(`Cliente ${nome} cadastrado com sucesso! ID: ${newId}`);
+            form.reset();
+            document.getElementById('cliente-id').value = newId + 1;
+        }
+
+        // Função para cadastrar novo produto
+        function cadastrarProduto(event) {
+            event.preventDefault();
+            const form = event.target;
+            let id = form['product-id'].value;
+            const nome = form['product-description'].value;
+            const quantidade = parseInt(form['product-quantity'].value, 10);
+            const preco = parseFloat(form['product-price'].value);
+            const categoria = form['product-category'].value;
+
+            if (!id) {
+                const newIdNum = appData.produtos.length > 0 ? Math.max(...appData.produtos.map(p => parseInt(p.id.split('-')[1]))) + 1 : 1;
+                id = `PROD-${newIdNum.toString().padStart(3, '0')}`;
+            }
+
+            const novoProduto = {
+                id,
+                nome,
+                quantidade,
+                preco,
+                categoria
+            };
+            
+            appData.produtos.push(novoProduto);
+            saveData();
+            alert(`Produto "${nome}" adicionado ao estoque!`);
+            form.reset();
+            renderEstoque(appData.produtos);
+            document.getElementById('add-product-form').classList.add('hidden');
+        }
+
+        // Função para adicionar nova venda
+        function adicionarVenda(event) {
+            event.preventDefault();
+            const form = event.target;
+            const idCliente = parseInt(form['cliente-id-venda'].value, 10);
+            const dataVenda = form['data-venda'].value;
+            const dataVencimento = form['data-vencimento'].value;
+            const valorTotal = parseFloat(form['valor-total-venda'].value);
+            const valorPago = parseFloat(form['valor-pago-venda'].value) || 0;
+
+            const cliente = appData.clientes.find(c => c.id === idCliente);
+            if (!cliente) {
+                alert("Cliente não encontrado.");
+                return;
+            }
+
+            const newId = appData.vendas.length > 0 ? Math.max(...appData.vendas.map(v => v.id)) + 1 : 1;
+
+            const novaVenda = {
+                id: newId,
+                idCliente,
+                dataVenda,
+                dataVencimento,
+                valorTotal,
+                valorPago
+            };
+            
+            appData.vendas.push(novaVenda);
+            saveData();
+            alert(`Venda para ${cliente.nome} adicionada com sucesso!`);
+            form.reset();
+        }
+
+        // Função para registrar pagamento
+        function registrarPagamento(event) {
+            event.preventDefault();
+            const form = event.target;
+            const idCliente = parseInt(form['cliente-id-pagamento'].value, 10);
+            const dataPagamento = form['data-pagamento'].value;
+            const valorPago = parseFloat(form['valor-pago-pagamento'].value);
+
+            const venda = appData.vendas.find(v => v.idCliente === idCliente && v.valorPago < v.valorTotal);
+            if (!venda) {
+                alert("Nenhuma promissória em aberto encontrada para este cliente.");
+                return;
+            }
+
+            venda.valorPago += valorPago;
+            saveData();
+
+            const valorFaltaPagar = venda.valorTotal - venda.valorPago;
+            if (valorFaltaPagar <= 0) {
+                alert(`Pagamento registrado. Promissória de ${venda.valorTotal} para o cliente ${idCliente} está quitada!`);
+            } else {
+                alert(`Pagamento de R$ ${valorPago.toFixed(2)} registrado. Falta pagar: R$ ${valorFaltaPagar.toFixed(2)}`);
+            }
+            form.reset();
+            document.getElementById('pagamento-cliente-info').classList.add('hidden');
+        }
+
+        // Renderiza os próximos vencimentos
+        function renderProximosVencimentos() {
+            const container = document.getElementById('proximos-vencimentos-container');
+            const hoje = new Date();
+            const proximosVencimentos = appData.vendas.filter(venda => {
+                const dataVencimento = new Date(venda.dataVencimento);
+                const diffTime = dataVencimento - hoje;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 7 && venda.valorPago < venda.valorTotal;
+            });
+            
+            if (proximosVencimentos.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500">Nenhum vencimento próximo nos próximos 7 dias.</p>`;
+                return;
+            }
+
+            let html = '';
+            proximosVencimentos.forEach(venda => {
+                const cliente = appData.clientes.find(c => c.id === venda.idCliente);
+                const diasRestantes = Math.ceil((new Date(venda.dataVencimento) - new Date()) / (1000 * 60 * 60 * 24));
+                html += `
+                    <div class="p-4 rounded-lg bg-yellow-100 border border-yellow-300">
+                        <p class="font-bold text-lg">${cliente.nome}</p>
+                        <p>Vencimento: ${venda.dataVencimento}</p>
+                        <p>Falta pagar: R$ ${(venda.valorTotal - venda.valorPago).toFixed(2)}</p>
+                        <p class="text-sm mt-1 text-gray-600">Faltam ${diasRestantes} dias</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // Event listeners
         actionButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const target = e.currentTarget.dataset.target;
                 showSection(target);
+                if (target === 'cadastrar-cliente-section') {
+                    const nextId = appData.clientes.length > 0 ? Math.max(...appData.clientes.map(c => c.id)) + 1 : 1;
+                    document.getElementById('cliente-id').value = nextId;
+                } else if (target === 'proximos-vencimentos-section') {
+                    renderProximosVencimentos();
+                }
             });
         });
 
-        // Event listener para o botão de voltar ao menu
         backToMenuBtn.addEventListener('click', () => {
             mainMenu.classList.remove('hidden');
             contentSectionsContainer.classList.add('hidden');
-            // Reseta o estado da seção de nota fiscal
-            document.getElementById('invoiceNumber').value = '';
-            invoiceDetailsDiv.innerHTML = `
-                <div class="text-center text-gray-500 p-4" id="invoice-placeholder">
-                    <span class="text-4xl">🧾</span>
-                    <p class="mt-2">Aguardando a busca de uma nota fiscal...</p>
-                </div>`;
+            document.getElementById('filtro-cidade').value = '';
         });
-        
-        // Dispara a carga de dados ao carregar a página
-        loadData();
 
-        // Configura uma atualização automática a cada 30 segundos
-        setInterval(loadData, 30000);
+        // Event Listeners para formulários
+        document.getElementById('cadastrar-cliente-form').addEventListener('submit', cadastrarCliente);
+        document.getElementById('venda-promissoria-form').addEventListener('submit', adicionarVenda);
+        document.getElementById('registrar-pagamento-form').addEventListener('submit', registrarPagamento);
+        document.getElementById('add-product-form').addEventListener('submit', cadastrarProduto);
+        document.getElementById('add-product-btn').addEventListener('click', () => {
+            document.getElementById('add-product-form').classList.remove('hidden');
+        });
+        document.getElementById('cancel-add-product').addEventListener('click', () => {
+            document.getElementById('add-product-form').classList.add('hidden');
+        });
+        document.getElementById('searchInvoiceBtn').addEventListener('click', searchInvoice);
+
+        // Event listeners para formatação de inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            IMask(
+                document.getElementById('telefone-cliente'), { mask: '(00) 00000-0000' }
+            );
+            IMask(
+                document.getElementById('cpf-cliente'), { mask: '000.000.000-00' }
+            );
+            IMask(
+                document.getElementById('rg-cliente'), { mask: '00.000.000-0' }
+            );
+        });
+
+        // Event listener para filtrar clientes por cidade
+        document.getElementById('filtro-cidade').addEventListener('input', (e) => {
+            const termo = e.target.value.toLowerCase();
+            const clientesFiltrados = appData.clientes.filter(cliente => cliente.cidade.toLowerCase().includes(termo));
+            renderClientes(clientesFiltrados);
+        });
+
+        // Event listener para buscar cliente na venda
+        document.getElementById('cliente-id-venda').addEventListener('input', (e) => {
+            const id = parseInt(e.target.value, 10);
+            const cliente = appData.clientes.find(c => c.id === id);
+            const clienteNomeSpan = document.getElementById('cliente-nome-venda');
+            if (cliente) {
+                clienteNomeSpan.textContent = `Cliente: ${cliente.nome}`;
+            } else {
+                clienteNomeSpan.textContent = `Cliente não encontrado`;
+            }
+        });
+
+        // Event listener para buscar cliente no pagamento
+        document.getElementById('cliente-id-pagamento').addEventListener('input', (e) => {
+            const id = parseInt(e.target.value, 10);
+            const cliente = appData.clientes.find(c => c.id === id);
+            const pagamentoInfoDiv = document.getElementById('pagamento-cliente-info');
+            if (cliente) {
+                const venda = appData.vendas.find(v => v.idCliente === id && v.valorPago < v.valorTotal);
+                if (venda) {
+                    pagamentoInfoDiv.classList.remove('hidden');
+                    pagamentoInfoDiv.innerHTML = `
+                        <p class="font-bold">Cliente: ${cliente.nome}</p>
+                        <p>Valor total da dívida: R$ ${venda.valorTotal.toFixed(2)}</p>
+                        <p>Valor já pago: R$ ${venda.valorPago.toFixed(2)}</p>
+                        <p>Falta pagar: R$ ${(venda.valorTotal - venda.valorPago).toFixed(2)}</p>
+                    `;
+                } else {
+                    pagamentoInfoDiv.classList.remove('hidden');
+                    pagamentoInfoDiv.innerHTML = `<p class="text-red-500">Este cliente não tem promissórias em aberto.</p>`;
+                }
+            } else {
+                pagamentoInfoDiv.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
