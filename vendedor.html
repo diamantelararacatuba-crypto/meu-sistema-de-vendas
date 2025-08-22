@@ -350,7 +350,7 @@
                     try {
                         const response = await fetch(SCRIPT_URL, {
                             method: 'POST',
-                            body: JSON.stringify({ action: 'getClientById', clientId: clientId }),
+                            body: JSON.stringify({ action: 'getClients', clientId: clientId }),
                             headers: { 'Content-Type': 'application/json' }
                         });
                         const result = await response.json();
@@ -389,7 +389,7 @@
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        body: JSON.stringify({ action: 'addPromissoryNote', data: saleData }),
+                        body: JSON.stringify({ action: 'addSale', data: saleData }),
                         headers: { 'Content-Type': 'application/json' }
                     });
                     const result = await response.json();
@@ -414,7 +414,7 @@
                     try {
                         const response = await fetch(SCRIPT_URL, {
                             method: 'POST',
-                            body: JSON.stringify({ action: 'getClientById', clientId: clientId }),
+                            body: JSON.stringify({ action: 'getClients', clientId: clientId }),
                             headers: { 'Content-Type': 'application/json' }
                         });
                         const result = await response.json();
@@ -453,7 +453,7 @@
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        body: JSON.stringify({ action: 'addPaymentByClient', data: data }),
+                        body: JSON.stringify({ action: 'addPayment', data: data }),
                         headers: { 'Content-Type': 'application/json' }
                     });
                     const result = await response.json();

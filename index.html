@@ -470,7 +470,7 @@
                 };
 
                 try {
-                    const result = await fetchApi('addPromissoryNote', payload);
+                    const result = await fetchApi('addSale', payload);
                     if (result.success) {
                         statusMessage.textContent = 'Nota promissória adicionada com sucesso!';
                         statusMessage.className = 'mt-4 text-center text-green-500';
