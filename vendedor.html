@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lançamento de Vendas e Pagamentos</title>
+    <title>Painel do Vendedor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Adicionando a biblioteca IMask para formatação automática -->
     <script src="https://unpkg.com/imask"></script>
@@ -54,6 +54,28 @@
             border-color: #4f46e5;
             box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
         }
+        /* Estilo para os botões de abas */
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition-property: background-color, color;
+            transition-duration: 200ms;
+        }
+        .tab-btn.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        .tab-btn:not(.active) {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: #d1d5db;
+        }
         /* Estilo para o modal de feedback */
         .feedback-modal {
             position: fixed;
@@ -79,14 +101,23 @@
 
     <div class="container">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold text-indigo-800">App do Vendedor</h1>
+            <h1 class="text-3xl font-extrabold text-indigo-800">Painel do Vendedor</h1>
             <p class="mt-2 text-md text-gray-600">
-                Cadastre clientes, lance vendas e registre pagamentos.
+                Gerencie clientes, vendas e pagamentos de forma fácil.
             </p>
         </header>
 
-        <!-- Formulário de Cadastro de Clientes -->
-        <section class="card mb-8">
+        <!-- NOVO: Barra de navegação por abas com um container de cartão -->
+        <div class="card mb-8">
+            <nav class="flex space-x-2">
+                <button id="tab-client" class="tab-btn active">Cadastro de Clientes</button>
+                <button id="tab-sale" class="tab-btn">Lançamento de Venda</button>
+                <button id="tab-payment" class="tab-btn">Registro de Pagamento</button>
+            </nav>
+        </div>
+
+        <!-- Seção de Cadastro de Clientes -->
+        <section id="section-client" class="card">
             <h2 class="text-xl font-bold mb-4">Cadastro de Clientes</h2>
             <form id="clientForm" class="space-y-4">
                 <div>
@@ -109,7 +140,6 @@
                     <label for="clientStreet" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
                     <input type="text" id="clientStreet" name="street" required>
                 </div>
-                <!-- NOVO: Adicionando campos para número e complemento -->
                 <div class="flex space-x-4">
                     <div class="w-1/2">
                         <label for="clientNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
@@ -132,8 +162,8 @@
             </form>
         </section>
 
-        <!-- Formulário de Lançamento de Venda -->
-        <section class="card mb-8">
+        <!-- Seção de Lançamento de Venda -->
+        <section id="section-sale" class="card hidden">
             <h2 class="text-xl font-bold mb-4">Lançamento de Venda</h2>
             <form id="saleForm" class="space-y-4">
                 <div>
@@ -164,8 +194,8 @@
             </form>
         </section>
 
-        <!-- Formulário de Registro de Pagamento -->
-        <section class="card">
+        <!-- Seção de Registro de Pagamento -->
+        <section id="section-payment" class="card hidden">
             <h2 class="text-xl font-bold mb-4">Registro de Pagamento</h2>
             <form id="paymentForm" class="space-y-4">
                 <div>
@@ -191,147 +221,187 @@
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUHvf_KSgH3nCykEeiM1bKbC2JyJMzNHXSfbww0AlZ9WJHYpB0LuDNKEmOMLc557FOpA/exec';
-
-        const clientForm = document.getElementById('clientForm');
-        const saleForm = document.getElementById('saleForm');
-        const paymentForm = document.getElementById('paymentForm');
-
-        // Referência para o modal de feedback
-        const feedbackModal = document.getElementById('feedbackModal');
-        const feedbackMessage = document.getElementById('feedbackMessage');
-        
-        // NOVO: Referência para os campos de entrada do cliente
-        const clientRGInput = document.getElementById('clientRG');
-        const clientCPFInput = document.getElementById('clientCPF');
-        const clientPhoneInput = document.getElementById('clientPhone');
-
-        // NOVO: Aplica as máscaras de formatação com a biblioteca IMask
-        IMask(clientRGInput, { mask: '00.000.000-0' });
-        IMask(clientCPFInput, { mask: '000.000.000-00' });
-        IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
-
-        // Função para exibir o modal de feedback
-        function showFeedbackModal(message, isSuccess) {
-            feedbackMessage.textContent = message;
-            feedbackModal.classList.add('show');
-            // Remove a classe 'show' após 3 segundos para esconder o modal
-            setTimeout(() => {
-                feedbackModal.classList.remove('show');
-            }, 3000);
-        }
-
-        // Listener para o formulário de cliente
-        clientForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {
-                type: 'cliente',
-                name: formData.get('name'),
-                rg: formData.get('rg'),
-                cpf: formData.get('cpf'),
-                phone: formData.get('phone'), // NOVO: Adicionando o telefone
-                street: formData.get('street'),
-                number: formData.get('number'), // NOVO: Adicionando o número da residência
-                complement: formData.get('complement'), // NOVO: Adicionando o complemento
-                neighborhood: formData.get('neighborhood'),
-                city: formData.get('city')
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Cliente cadastrado com sucesso!');
-                    e.target.reset();
-                } else {
-                    showFeedbackModal('Erro ao cadastrar cliente: ' + result.message);
-                }
-            } catch (error) {
-                showFeedbackModal('Erro de conexão. Verifique sua internet.');
-                console.error('Erro:', error);
-            }
-        });
-
-        // Listener para o formulário de venda
-        saleForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {
-                type: 'venda',
-                invoice: formData.get('invoice'),
-                date: formData.get('date'),
-                clientName: formData.get('clientName'),
-                items: JSON.parse(formData.get('items')),
-                totalValue: parseFloat(formData.get('totalValue')),
-                dueDate: formData.get('dueDate')
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Venda registrada com sucesso!');
-                    e.target.reset();
-                } else {
-                    showFeedbackModal('Erro ao registrar venda: ' + result.message);
-                }
-            } catch (error) {
-                showFeedbackModal('Erro de conexão. Verifique sua internet.');
-                console.error('Erro:', error);
-            }
-        });
-
-        // Listener para o formulário de pagamento
-        paymentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const invoiceNumber = formData.get('invoiceNumber');
-            const amount = parseFloat(formData.get('amount'));
-            const newDueDate = formData.get('newDueDate');
-
-            // Validação simples
-            if (invoiceNumber.trim() === '' || amount <= 0 || !newDueDate) {
-                showFeedbackModal('Por favor, preencha todos os campos corretamente.');
-                return;
-            }
-
-            const data = {
-                type: 'pagamento',
-                invoiceNumber: invoiceNumber,
-                amount: amount,
-                newDueDate: newDueDate
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showFeedbackModal('Pagamento registrado com sucesso!');
-                    e.target.reset();
-                } else {
-                    showFeedbackModal('Erro ao registrar pagamento: ' + result.message);
-                }
-            } catch (error) {
-                showFeedbackModal('Erro de conexão. Verifique sua internet.');
-                console.error('Erro:', error);
-            }
-        });
-
-        // Configuração para a data de hoje no campo de data da venda
+        // Oculta todas as seções, exceto a de clientes.
         document.addEventListener('DOMContentLoaded', () => {
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUHvf_KSgH3nCykEeiM1bKbC2JyJMzNHXSfbww0AlZ9WJHYpB0LuDNKEmOMLc557FOpA/exec';
+
+            // Referências para os botões e seções
+            const tabClientBtn = document.getElementById('tab-client');
+            const tabSaleBtn = document.getElementById('tab-sale');
+            const tabPaymentBtn = document.getElementById('tab-payment');
+            const sectionClient = document.getElementById('section-client');
+            const sectionSale = document.getElementById('section-sale');
+            const sectionPayment = document.getElementById('section-payment');
+
+            // Referência para os formulários
+            const clientForm = document.getElementById('clientForm');
+            const saleForm = document.getElementById('saleForm');
+            const paymentForm = document.getElementById('paymentForm');
+
+            // Referência para o modal de feedback
+            const feedbackModal = document.getElementById('feedbackModal');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            
+            // Referência para os campos de entrada do cliente
+            const clientRGInput = document.getElementById('clientRG');
+            const clientCPFInput = document.getElementById('clientCPF');
+            const clientPhoneInput = document.getElementById('clientPhone');
+
+            // Aplica as máscaras de formatação com a biblioteca IMask
+            if (clientRGInput) IMask(clientRGInput, { mask: '00.000.000-0' });
+            if (clientCPFInput) IMask(clientCPFInput, { mask: '000.000.000-00' });
+            if (clientPhoneInput) IMask(clientPhoneInput, { mask: '(00) 00000-0000' });
+
+            // Função para exibir a seção desejada e esconder as outras
+            function showSection(sectionId) {
+                // Esconde todas as seções
+                sectionClient.classList.add('hidden');
+                sectionSale.classList.add('hidden');
+                sectionPayment.classList.add('hidden');
+                
+                // Remove a classe 'active' de todos os botões
+                tabClientBtn.classList.remove('active');
+                tabSaleBtn.classList.remove('active');
+                tabPaymentBtn.classList.remove('active');
+
+                // Exibe a seção correta e adiciona a classe 'active' ao botão correspondente
+                if (sectionId === 'client') {
+                    sectionClient.classList.remove('hidden');
+                    tabClientBtn.classList.add('active');
+                } else if (sectionId === 'sale') {
+                    sectionSale.classList.remove('hidden');
+                    tabSaleBtn.classList.add('active');
+                } else if (sectionId === 'payment') {
+                    sectionPayment.classList.remove('hidden');
+                    tabPaymentBtn.classList.add('active');
+                }
+            }
+
+            // Adiciona os event listeners para os botões das abas
+            if (tabClientBtn) tabClientBtn.addEventListener('click', () => showSection('client'));
+            if (tabSaleBtn) tabSaleBtn.addEventListener('click', () => showSection('sale'));
+            if (tabPaymentBtn) tabPaymentBtn.addEventListener('click', () => showSection('payment'));
+
+            // Função para exibir o modal de feedback
+            function showFeedbackModal(message) {
+                feedbackMessage.textContent = message;
+                feedbackModal.classList.add('show');
+                // Remove a classe 'show' após 3 segundos para esconder o modal
+                setTimeout(() => {
+                    feedbackModal.classList.remove('show');
+                }, 3000);
+            }
+
+            // Listener para o formulário de cliente
+            if (clientForm) clientForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    type: 'cliente',
+                    name: formData.get('name'),
+                    rg: formData.get('rg'),
+                    cpf: formData.get('cpf'),
+                    phone: formData.get('phone'),
+                    street: formData.get('street'),
+                    number: formData.get('number'),
+                    complement: formData.get('complement'),
+                    neighborhood: formData.get('neighborhood'),
+                    city: formData.get('city')
+                };
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        showFeedbackModal('Cliente cadastrado com sucesso!');
+                        e.target.reset();
+                    } else {
+                        showFeedbackModal('Erro ao cadastrar cliente: ' + result.message);
+                    }
+                } catch (error) {
+                    showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                    console.error('Erro:', error);
+                }
+            });
+
+            // Listener para o formulário de venda
+            if (saleForm) saleForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    type: 'venda',
+                    invoice: formData.get('invoice'),
+                    date: formData.get('date'),
+                    clientName: formData.get('clientName'),
+                    items: JSON.parse(formData.get('items')),
+                    totalValue: parseFloat(formData.get('totalValue')),
+                    dueDate: formData.get('dueDate')
+                };
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        showFeedbackModal('Venda registrada com sucesso!');
+                        e.target.reset();
+                    } else {
+                        showFeedbackModal('Erro ao registrar venda: ' + result.message);
+                    }
+                } catch (error) {
+                    showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                    console.error('Erro:', error);
+                }
+            });
+
+            // Listener para o formulário de pagamento
+            if (paymentForm) paymentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const invoiceNumber = formData.get('invoiceNumber');
+                const amount = parseFloat(formData.get('amount'));
+                const newDueDate = formData.get('newDueDate');
+
+                // Validação simples
+                if (invoiceNumber.trim() === '' || amount <= 0 || !newDueDate) {
+                    showFeedbackModal('Por favor, preencha todos os campos corretamente.');
+                    return;
+                }
+
+                const data = {
+                    type: 'pagamento',
+                    invoiceNumber: invoiceNumber,
+                    amount: amount,
+                    newDueDate: newDueDate
+                };
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        showFeedbackModal('Pagamento registrado com sucesso!');
+                        e.target.reset();
+                    } else {
+                        showFeedbackModal('Erro ao registrar pagamento: ' + result.message);
+                    }
+                } catch (error) {
+                    showFeedbackModal('Erro de conexão. Verifique sua internet.');
+                    console.error('Erro:', error);
+                }
+            });
+
+            // Configuração para a data de hoje no campo de data da venda
             const today = new Date().toISOString().split('T')[0];
             const saleDateInput = document.getElementById('saleDate');
             if (saleDateInput) {
